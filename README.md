@@ -6,8 +6,8 @@
 |--------|-----------------|---------------------|---------|
 | **MESA Framework** | Python, JavaScript | Готовый фреймворк для агентов, визуализация, сбор статистики | [GitHub](https://github.com/projectmesa/mesa) |
 | **OpenAI Multi-Agent Economy** | Python, PyGame | Модели спроса-предложения, агентное поведение | [GitHub](https://github.com/openai/multi-agent-emergence-environments) |
-| **Capitalism Lab**| Нет информации | Модели спроса-предложения, агентное поведение | Компания скрыла репозиторий, [ссылка на игру](https://www.capitalismlab.com)|
-| **Virtonomics**| Нет информации | Модели спроса-предложения, агентное поведение | Компания скрыла репозиторий, [ссылка на игру](https://virtonomics.com)|
+| **Capitalism Lab**| Нет информации | Реалистичная бизнес-симуляция | Компания скрыла репозиторий, [ссылка на игру](https://www.capitalismlab.com)|
+| **Virtonomics**| Нет информации | Экономический симулятор | Компания скрыла репозиторий, [ссылка на игру](https://virtonomics.com)|
 
 
 ## Оглавление
