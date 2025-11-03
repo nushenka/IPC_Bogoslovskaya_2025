@@ -2,7 +2,7 @@
 ## Похожие проекты
 
 
-| Проект | Язык/Технологии | Полезные компоненты | Ссылка  |
+| Проект | Язык | Суть | Ссылка  |
 |--------|-----------------|---------------------|---------|
 | **MESA Framework** | Python, JavaScript | Готовый фреймворк для агентов, визуализация, сбор статистики | [GitHub](https://github.com/projectmesa/mesa) |
 | **OpenAI Multi-Agent Economy** | Python, PyGame | Модели спроса-предложения, агентное поведение | [GitHub](https://github.com/openai/multi-agent-emergence-environments) |
