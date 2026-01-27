@@ -124,13 +124,21 @@ class UIManager {
                 const profitClass = company.profit >= 0 ? 'profit-positive' : 'profit-negative';
                 const profitSign = company.profit >= 0 ? '+' : '';
                 
+                // 🔥 Получаем формулу издержек (только для купленных компаний)
+                const costFormula = company.getCostFormula ? 
+                    company.getCostFormula() : 'TC = ? (купите компанию)';
+                
+                // 🔥 Получаем название рыночной структуры
+                const marketStructureName = company.getMarketStructureName ? 
+                    company.getMarketStructureName() : company.type || '';
+                
                 html += `
                 <div class="company-card ${this.selectedCompany?.id === company.id ? 'selected' : ''}" data-id="${company.id}">
                     <div class="company-header">
                         <span class="company-icon">${company.icon || '🏢'}</span>
                         <div class="company-title">
                             <h4>${company.name}</h4>
-                            <span class="company-type">${company.type || ''}</span>
+                            <span class="company-type">${marketStructureName}</span>
                         </div>
                         <span class="company-profit ${profitClass}">
                             ${profitSign}${Math.round(company.profit).toLocaleString()}₽
@@ -148,6 +156,11 @@ class UIManager {
                         <div class="detail-row">
                             <span>Спрос:</span>
                             <span class="detail-value">${company.demand ? company.demand.toLocaleString() : '?'} ед.</span>
+                        </div>
+                        <!-- 🔥 ДОБАВЛЯЕМ ФОРМУЛУ ИЗДЕРЖЕК -->
+                        <div class="detail-row formula-row">
+                            <span class="formula-label">Издержки:</span>
+                            <span class="formula-value">${costFormula}</span>
                         </div>
                     </div>
                     <button class="btn-select-company" data-id="${company.id}">
@@ -214,7 +227,12 @@ class UIManager {
         const detailsPanel = document.getElementById('companyDetails');
         if (!detailsPanel) return;
         
-        // Простые детали без сложных формул
+        // 🔥 Получаем формулы
+        const costFormula = this.selectedCompany.getCostFormula ? 
+            this.selectedCompany.getCostFormula() : 'TC = ?';
+        const demandFormula = this.selectedCompany.getDemandFormula ? 
+            this.selectedCompany.getDemandFormula() : 'P = ? - ?·Q';
+        
         detailsPanel.style.display = 'block';
         detailsPanel.innerHTML = `
             <h4>📊 Информация о компании</h4>
@@ -236,6 +254,16 @@ class UIManager {
                     <span class="detail-value ${this.selectedCompany.profit >= 0 ? 'profit-positive' : 'profit-negative'}">
                         ${this.selectedCompany.profit >= 0 ? '+' : ''}${Math.round(this.selectedCompany.profit).toLocaleString()} ₽
                     </span>
+                </div>
+                <!-- 🔥 ДОБАВЛЯЕМ ФОРМУЛУ СПРОСА -->
+                <div class="detail-item formula-item">
+                    <span class="detail-label">Формула спроса:</span>
+                    <span class="detail-value formula-demand">${demandFormula}</span>
+                </div>
+                <!-- 🔥 ДОБАВЛЯЕМ ФОРМУЛУ ИЗДЕРЖЕК -->
+                <div class="detail-item formula-item">
+                    <span class="detail-label">Формула издержек:</span>
+                    <span class="detail-value formula-cost">${costFormula}</span>
                 </div>
             </div>
         `;
@@ -323,6 +351,9 @@ class UIManager {
                         <div class="companies-grid">
                             ${state.availableCompanies.map(company => {
                                 const canAfford = state.player.capital >= company.basePrice;
+                                const marketStructureName = company.getMarketStructureName ? 
+                                    company.getMarketStructureName() : company.type || '';
+                                
                                 return `
                                 <div class="company-option ${canAfford ? '' : 'disabled'}">
                                     <div class="company-option-header">
@@ -330,6 +361,7 @@ class UIManager {
                                         <div>
                                             <h4>${company.name}</h4>
                                             <p class="company-price">${company.basePrice.toLocaleString()}₽</p>
+                                            <p class="company-structure">${marketStructureName}</p>
                                         </div>
                                     </div>
                                     <p class="company-description">${company.description || 'Бизнес в экономическом симуляторе'}</p>
@@ -380,7 +412,7 @@ class UIManager {
         const success = this.gameEngine.buyCompany(companyId);
         if (success) {
             this.updateUI();
-            alert('Компания успешно куплена!');
+            alert('Компания успешно куплена! Коэффициенты издержек рандомизированы.');
         } else {
             alert('Не удалось купить компанию. Проверьте, хватает ли средств.');
         }

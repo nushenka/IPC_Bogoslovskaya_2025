@@ -6,15 +6,25 @@ class Company {
         this.icon = config.icon || '🏢';
         this.basePrice = config.basePrice || 100000;
         
-        // Параметры спроса и издержек
+        // Параметры спроса
         this.demandA = config.demandA || 100;
         this.demandB = config.demandB || 0.01;
-        this.costA = config.costA || 0.001;
+        
+        // 🔥 ОРИГИНАЛЬНЫЕ коэффициенты из конфига (неизменяемые)
+        this.originalCostA = config.costA || 0;
+        this.originalCostB = config.costB || 10;
+        this.originalCostC = config.costC || 10000;
+        
+        // 🔥 ТЕКУЩИЕ коэффициенты (будут рандомизированы при покупке)
+        this.costA = config.costA || 0;
         this.costB = config.costB || 10;
         this.costC = config.costC || 10000;
         
+        // 🔥 Определяем тип издержек
+        this.hasQuadraticCosts = config.costA && config.costA > 0;
+        
         // Рыночная структура
-        this.marketStructure = config.marketStructure || 'perfect_competition';
+        this.marketStructure = config.marketType || 'perfect_competition';
         this.competitors = config.competitors || 0;
         this.competitorCosts = config.competitorCosts || [];
         this.commonCompetitorCosts = config.commonCompetitorCosts || null;
@@ -41,6 +51,47 @@ class Company {
         this.config = config;
         
         console.log(`Создана компания: ${this.name} (${this.marketStructure})`);
+    }
+    
+    // 🔥 МЕТОД ДЛЯ РАНДОМИЗАЦИИ КОЭФФИЦИЕНТОВ (вызывается при покупке)
+    randomizeCosts() {
+        const variation = 0.2; // ±20% вариация
+        
+        // Случайное изменение коэффициентов
+        this.costA = this.originalCostA * (0.8 + Math.random() * variation);
+        this.costB = this.originalCostB * (0.8 + Math.random() * variation);
+        this.costC = this.originalCostC * (0.8 + Math.random() * variation);
+        
+        // Округляем для читаемости
+        if (this.costA > 0) {
+            this.costA = Math.round(this.costA * 10000) / 10000; // 4 знака
+        }
+        this.costB = Math.round(this.costB * 100) / 100; // 2 знака
+        this.costC = Math.round(this.costC);
+        
+        // Обновляем флаг квадратичных издержек
+        this.hasQuadraticCosts = this.costA > 0;
+        
+        console.log(`Коэффициенты издержек для ${this.name} рандомизированы:`);
+        console.log(`A: ${this.costA}, B: ${this.costB}, C: ${this.costC}`);
+    }
+    
+    // 🔥 МЕТОД ДЛЯ ПОЛУЧЕНИЯ ФОРМУЛЫ ИЗДЕРЖЕК
+    getCostFormula() {
+        if (!this.ownedByPlayer) {
+            return "TC = ? (купите компанию, чтобы увидеть формулу)";
+        }
+        
+        if (this.hasQuadraticCosts && this.costA > 0) {
+            return `TC = ${this.costA.toFixed(4)}·Q² + ${this.costB.toFixed(2)}·Q + ${this.costC.toLocaleString()}`;
+        } else {
+            return `TC = ${this.costB.toFixed(2)}·Q + ${this.costC.toLocaleString()}`;
+        }
+    }
+    
+    // 🔥 МЕТОД ДЛЯ ПОЛУЧЕНИЯ ФОРМУЛЫ СПРОСА
+    getDemandFormula() {
+        return `P = ${this.demandA.toFixed(2)} - ${this.demandB.toFixed(4)}·Q`;
     }
     
     calculateInitialPrice() {
@@ -189,8 +240,8 @@ class Company {
             description: this.description,
             
             // Формулы
-            demandFormula: `P = ${this.demandA.toFixed(2)} - ${this.demandB.toFixed(4)}Q`,
-            costFormula: `TC = ${this.costA.toFixed(4)}Q² + ${this.costB.toFixed(2)}Q + ${this.costC.toLocaleString()}`,
+            demandFormula: this.getDemandFormula(),
+            costFormula: this.getCostFormula(),
             
             // Текущие значения
             productPrice: this.productPrice,
@@ -213,7 +264,16 @@ class Company {
             // Особенности
             specialType: this.specialType,
             isMonopoly: this.marketStructure === 'monopoly',
-            isOligopoly: ['cournot', 'stackelberg_follower'].includes(this.marketStructure)
+            isOligopoly: ['cournot', 'stackelberg_follower'].includes(this.marketStructure),
+            
+            // Коэффициенты (только для купленных компаний)
+            coefficients: this.ownedByPlayer ? {
+                costA: this.costA,
+                costB: this.costB,
+                costC: this.costC,
+                demandA: this.demandA,
+                demandB: this.demandB
+            } : null
         };
     }
     

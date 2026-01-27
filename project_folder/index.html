@@ -145,19 +145,27 @@
     </div>
 
     <!-- Подключаем JavaScript файлы БЕЗ type="module" -->
-    <script src="js/utils/helpers.js"></script>
-    
-    <script src="js/config/businessConfig.js"></script>
-    <script src="js/config/shockConfig.js"></script>
-    
-    <script src="js/models/Player.js"></script>
-    <script src="js/models/Company.js"></script>
-    <script src="js/models/EconomicEnvironment.js"></script>
-    
-    <script src="js/game/GameEngine.js"></script>
-    
-    <script src="js/ui/UIManager.js"></script>
-    
-    <script src="main.js"></script>
+   <!-- Утилиты -->
+<script src="js/utils/helpers.js"></script>
+
+<!-- Конфигурации (ВАЖЕН ПОРЯДОК!) -->
+<script src="js/config/businessConfig.js"></script>
+<script src="js/config/constants.js"></script>  <!-- ДОЛЖЕН БЫТЬ ПЕРЕД StockMarket.js -->
+
+<!-- Модели -->
+<script src="js/models/Player.js"></script>
+<script src="js/models/Company.js"></script>
+<script src="js/models/EconomicEnvironment.js"></script>
+<script src="js/models/StockMarket.js"></script>
+<script src="js/models/Bank.js"></script>
+
+<!-- Игровая логика -->
+<script src="js/game/GameEngine.js"></script>
+
+<!-- UI -->
+<script src="js/ui/UIManager.js"></script>
+
+<!-- Точка входа -->
+<script src="main.js"></script>
 </body>
 </html>
