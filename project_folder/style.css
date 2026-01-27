@@ -690,3 +690,64 @@ body {
         grid-template-columns: 1fr;
     }
 }
+.formula-row {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #e9ecef;
+}
+
+.formula-label {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+.formula-value {
+    font-size: 0.9em;
+    font-family: 'Courier New', monospace;
+    color: #e74c3c;
+    background: #f8f9fa;
+    padding: 3px 6px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.formula-item {
+    grid-column: span 2;
+    margin-top: 10px;
+}
+
+.formula-demand {
+    font-family: 'Courier New', monospace;
+    color: #3498db;
+    background: #f8f9fa;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border-left: 3px solid #3498db;
+}
+
+.formula-cost {
+    font-family: 'Courier New', monospace;
+    color: #e74c3c;
+    background: #f8f9fa;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border-left: 3px solid #e74c3c;
+}
+
+/* Для структуры компании в модалке */
+.company-structure {
+    font-size: 0.85em;
+    color: #7f8c8d;
+    margin-top: 2px;
+}
+
+/* Улучшаем отображение типа компании */
+.company-type {
+    font-size: 0.85em;
+    color: #7f8c8d;
+    background: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 3px;
+}
