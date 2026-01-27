@@ -1,0 +1,29 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+}
+
+.company {
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+button {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+#logPanel {
+  margin-top: 20px;
+  padding: 10px;
+  background: #f4f6f8;
+  border: 1px solid #ccc;
+  height: 120px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+.log-success { color: green; }
+.log-error { color: red; }
+.log-info { color: #333; }
