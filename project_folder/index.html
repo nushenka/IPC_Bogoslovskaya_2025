@@ -1,19 +1,163 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Экономическая игра</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Экономический симулятор</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="game-container">
+        <!-- Шапка игры -->
+        <header class="game-header">
+            <div class="player-stats">
+                <h1>Экономический симулятор</h1>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span class="stat-label">Капитал:</span>
+                        <span id="playerCapital" class="stat-value">1,000,000 ₽</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Раунд:</span>
+                        <span id="currentRound" class="stat-value">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Чистая стоимость:</span>
+                        <span id="netWorth" class="stat-value">1,000,000 ₽</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="economy-stats">
+                <div class="economy-item">
+                    <span>📈 Инфляция:</span>
+                    <span id="inflationRate">5.0%</span>
+                </div>
+                <div class="economy-item">
+                    <span>🏦 Ставка ЦБ:</span>
+                    <span id="interestRate">7.5%</span>
+                </div>
+                <div class="economy-item">
+                    <span>💰 Налоги:</span>
+                    <span id="taxRate">20%</span>
+                </div>
+            </div>
+        </header>
 
-  <h1>Экономическая игра</h1>
+        <!-- Основная игровая область -->
+        <main class="game-main">
+            <!-- Левая панель - Бизнесы -->
+            <section class="panel businesses-panel">
+                <div class="panel-header">
+                    <h2>🏢 Ваши компании</h2>
+                    <button id="btnBuyCompany" class="btn btn-primary">
+                        + Купить компанию
+                    </button>
+                </div>
+                <div id="companiesList" class="companies-list">
+                    <!-- Список компаний будет генерироваться здесь -->
+                </div>
+            </section>
 
-  <button id="startButton">Начать игру</button>
-  <div id="gameStatus"></div>
-  <div id="companyList"></div>
+            <!-- Центральная панель - Управление -->
+            <section class="panel control-panel">
+                <div class="panel-header">
+                    <h2>⚙️ Управление бизнесом</h2>
+                </div>
+                
+                <div id="businessControls" class="business-controls" style="display: none;">
+                    <h3 id="selectedCompanyName">Название компании</h3>
+                    
+                    <div class="control-group">
+                        <label for="priceInput">Цена товара/услуги (₽):</label>
+                        <div class="input-with-button">
+                            <input type="number" id="priceInput" min="1" value="100">
+                            <button id="btnApplyPrice" class="btn btn-small">Применить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="productionInput">Объем производства (ед.):</label>
+                        <div class="input-with-button">
+                            <input type="number" id="productionInput" min="0" value="1000">
+                            <button id="btnApplyProduction" class="btn btn-small">Применить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-buttons">
+                        <button id="btnSellCompany" class="btn btn-danger">
+                            🗑️ Продать компанию
+                        </button>
+                        <button id="btnCompanyDetails" class="btn btn-info">
+                            📊 Детали компании
+                        </button>
+                    </div>
+                    
+                    <!-- Панель деталей компании -->
+                    <div id="companyDetails" class="company-details-panel" style="display: none; margin-top: 20px;">
+                        <!-- Детали компании будут отображаться здесь -->
+                    </div>
+                </div>
+                
+                <div id="noCompanySelected" class="no-company-message" style="text-align: center; padding: 40px; color: #7f8c8d;">
+                    <h3>Выберите компанию для управления</h3>
+                    <p>Нажмите на компанию в левой панели, чтобы начать управление</p>
+                </div>
+            </section>
 
-  <!-- ВАЖНО -->
-  <script type="module" src="./main.js"></script>
+            <!-- Правая панель - Аналитика -->
+            <section class="panel analytics-panel">
+                <div class="panel-header">
+                    <h2>📈 Быстрая аналитика</h2>
+                </div>
+                <div id="quickAnalytics" class="quick-analytics">
+                    <!-- Быстрая аналитика будет здесь -->
+                    <div class="analytics-placeholder">
+                        <p>После первого раунда здесь появится аналитика</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Нижняя панель управления -->
+        <footer class="game-footer">
+            <div class="footer-left">
+                <button id="btnSaveGame" class="btn btn-secondary">
+                    💾 Сохранить игру
+                </button>
+                <button id="btnLoadGame" class="btn btn-secondary">
+                    📂 Загрузить игру
+                </button>
+            </div>
+            
+            <div class="footer-center">
+                <div class="round-status">
+                    <span id="roundStatus">Готов к началу игры</span>
+                </div>
+            </div>
+            
+            <div class="footer-right">
+                <button id="btnNextRound" class="btn btn-primary btn-large">
+                    ⏭️ Следующий раунд
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Подключаем JavaScript файлы БЕЗ type="module" -->
+    <script src="js/utils/helpers.js"></script>
+    
+    <script src="js/config/businessConfig.js"></script>
+    <script src="js/config/shockConfig.js"></script>
+    
+    <script src="js/models/Player.js"></script>
+    <script src="js/models/Company.js"></script>
+    <script src="js/models/EconomicEnvironment.js"></script>
+    
+    <script src="js/game/GameEngine.js"></script>
+    
+    <script src="js/ui/UIManager.js"></script>
+    
+    <script src="main.js"></script>
 </body>
 </html>

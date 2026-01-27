@@ -1,25 +1,31 @@
-export class EconomicEnvironment {
-  constructor(activeShocks = [], baseInterestRate = 0.08, roundNum = 1) {
-    this.activeShocks = activeShocks;
-    this.baseInterestRate = baseInterestRate;
-    this.roundNum = roundNum;
-  }
-
-  demandMultiplier(sector) {
-    return this.activeShocks.reduce(
-      (m, s) => m * (s.demandEffects?.[sector] || 1),
-      1
-    );
-  }
-
-  costMultiplier(sector) {
-    return this.activeShocks.reduce(
-      (m, s) => m * (s.costEffects?.[sector] || 1),
-      1
-    );
-  }
-
-  interestRate() {
-    return Math.max(this.baseInterestRate, 0);
-  }
+// js/models/EconomicEnvironment.js
+class EconomicEnvironment {
+    constructor() {
+        this.inflation = 5.0;
+        this.interestRate = 7.5;
+        this.taxRate = 20;
+        this.globalDemand = 85;
+    }
+    
+    update() {
+        // Случайные изменения
+        this.inflation += (Math.random() - 0.5) * 0.5;
+        this.globalDemand += (Math.random() - 0.5) * 2;
+        
+        // Ограничения
+        this.inflation = Math.max(0, Math.min(20, this.inflation));
+        this.globalDemand = Math.max(20, Math.min(120, this.globalDemand));
+    }
+    
+    getCurrentState() {
+        return {
+            inflation: this.inflation,
+            interestRate: this.interestRate,
+            taxRate: this.taxRate,
+            globalDemand: this.globalDemand
+        };
+    }
 }
+
+// Делаем доступным глобально
+window.EconomicEnvironment = EconomicEnvironment;

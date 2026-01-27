@@ -1,29 +1,692 @@
+/* style.css - ОБНОВЛЕННАЯ ВЕРСИЯ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    min-height: 100vh;
 }
 
-.company {
-  background: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 6px;
+.game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
 }
 
-button {
-  padding: 6px 12px;
-  cursor: pointer;
+/* Шапка */
+.game-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
-#logPanel {
-  margin-top: 20px;
-  padding: 10px;
-  background: #f4f6f8;
-  border: 1px solid #ccc;
-  height: 120px;
-  overflow-y: auto;
-  font-size: 14px;
+
+.player-stats h1 {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #f1c40f;
 }
-.log-success { color: green; }
-.log-error { color: red; }
-.log-info { color: #333; }
+
+.stats-row {
+    display: flex;
+    gap: 25px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 3px;
+}
+
+.stat-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.economy-stats {
+    display: flex;
+    gap: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.economy-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.economy-item span:first-child {
+    opacity: 0.9;
+}
+
+/* Основная область */
+.game-main {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    gap: 20px;
+    background: #f8f9fa;
+}
+
+.panel {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+.businesses-panel {
+    flex: 0 0 320px;
+    border-top: 4px solid #3498db;
+}
+
+.control-panel {
+    flex: 1;
+    border-top: 4px solid #2ecc71;
+}
+
+.analytics-panel {
+    flex: 0 0 320px;
+    border-top: 4px solid #9b59b6;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f1f3f5;
+}
+
+.panel-header h2 {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Кнопки */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #1c6ea4 100%);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+.btn-large {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.btn-disabled {
+    background: #bdc3c7 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.btn-disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Компании */
+.companies-list {
+    margin-top: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.company-card {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.company-card:hover {
+    border-color: #3498db;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.15);
+}
+
+.company-card.selected {
+    border-color: #2ecc71;
+    background: linear-gradient(135deg, #f8fff9 0%, #e8f5e9 100%);
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.2);
+}
+
+.company-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.company-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border-radius: 10px;
+}
+
+.company-title {
+    flex: 1;
+}
+
+.company-title h4 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.company-type {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    background: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.company-profit {
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 5px 12px;
+    border-radius: 6px;
+    background: #f8f9fa;
+}
+
+.profit-positive {
+    color: #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.profit-negative {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.company-details {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.btn-select-company {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-select-company:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #1c6ea4 100%);
+    transform: translateY(-2px);
+}
+
+.empty-message {
+    text-align: center;
+    padding: 50px 20px;
+    color: #7f8c8d;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+/* Управление */
+.business-controls {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.no-company-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.no-company-message h3 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.no-company-message p {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.control-group {
+    margin-bottom: 25px;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.input-with-button input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.input-with-button input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.control-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+/* Детали компании */
+.company-details-panel {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin-top: 25px;
+    border-left: 4px solid #3498db;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.company-details-panel h4 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.simple-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.detail-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.detail-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+/* Футер */
+.game-footer {
+    background: white;
+    padding: 20px 25px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+.footer-left, .footer-right {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.footer-center {
+    flex: 1;
+    text-align: center;
+}
+
+.round-status {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+    background: #f8f9fa;
+    padding: 8px 20px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* Модальные окна */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    animation: fadeInOverlay 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.modal-header h3 {
+    font-size: 1.6rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.modal-subtitle {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+.modal-body {
+    margin: 25px 0;
+}
+
+.companies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.company-option {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 25px;
+    transition: all 0.3s ease;
+}
+
+.company-option:hover {
+    border-color: #3498db;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(52, 152, 219, 0.15);
+}
+
+.company-option.disabled {
+    opacity: 0.6;
+}
+
+.company-option.disabled:hover {
+    transform: none;
+    border-color: #e9ecef;
+    box-shadow: none;
+}
+
+.company-option-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.company-option-header h4 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.company-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.company-description {
+    color: #7f8c8d;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.modal-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Аналитика */
+.analytics-placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.quick-analytics {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+/* Полоса прокрутки */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .game-main {
+        flex-direction: column;
+    }
+    
+    .businesses-panel,
+    .analytics-panel {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+    
+    .companies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .economy-stats {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .game-footer {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .footer-left, .footer-right, .footer-center {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .control-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .companies-grid {
+        grid-template-columns: 1fr;
+    }
+}
