@@ -10,17 +10,17 @@ class Company {
         this.demandA = config.demandA || 100;
         this.demandB = config.demandB || 0.01;
         
-        // 🔥 ОРИГИНАЛЬНЫЕ коэффициенты из конфига (неизменяемые)
+        //  ОРИГИНАЛЬНЫЕ коэффициенты из конфига (неизменяемые)
         this.originalCostA = config.costA || 0;
         this.originalCostB = config.costB || 10;
         this.originalCostC = config.costC || 100;
         
-        // 🔥 ТЕКУЩИЕ коэффициенты (будут рандомизированы при покупке)
+        //  ТЕКУЩИЕ коэффициенты (будут рандомизированы при покупке)
         this.costA = config.costA || 0;
         this.costB = config.costB || 10;
         this.costC = config.costC || 1;
         
-        // 🔥 Определяем тип издержек
+        //  Определяем тип издержек
         this.hasQuadraticCosts = config.costA && config.costA > 0;
         
         // Рыночная структура
@@ -53,7 +53,7 @@ class Company {
         console.log(`Создана компания: ${this.name} (${this.marketStructure})`);
     }
     
-    // 🔥 МЕТОД ДЛЯ РАНДОМИЗАЦИИ КОЭФФИЦИЕНТОВ (вызывается при покупке)
+    //  МЕТОД ДЛЯ РАНДОМИЗАЦИИ КОЭФФИЦИЕНТОВ (вызывается при покупке)
     randomizeCosts() {
         const variation = 0.2; // ±20% вариация
         
@@ -76,7 +76,7 @@ class Company {
         console.log(`A: ${this.costA}, B: ${this.costB}, C: ${this.costC}`);
     }
     
-    // 🔥 МЕТОД ДЛЯ ПОЛУЧЕНИЯ ФОРМУЛЫ ИЗДЕРЖЕК
+    //  МЕТОД ДЛЯ ПОЛУЧЕНИЯ ФОРМУЛЫ ИЗДЕРЖЕК
     getCostFormula() {
         if (!this.ownedByPlayer) {
             return "TC = ? (купите компанию, чтобы увидеть формулу)";
@@ -89,7 +89,7 @@ class Company {
         }
     }
     
-    // 🔥 МЕТОД ДЛЯ ПОЛУЧЕНИЯ ФОРМУЛЫ СПРОСА
+    //  МЕТОД ДЛЯ ПОЛУЧЕНИЯ ФОРМУЛЫ СПРОСА
     getDemandFormula() {
         return `P = ${this.demandA.toFixed(2)} - ${this.demandB.toFixed(4)}·Q`;
     }
