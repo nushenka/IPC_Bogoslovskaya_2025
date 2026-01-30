@@ -13,12 +13,12 @@ class Company {
         // 🔥 ОРИГИНАЛЬНЫЕ коэффициенты из конфига (неизменяемые)
         this.originalCostA = config.costA || 0;
         this.originalCostB = config.costB || 10;
-        this.originalCostC = config.costC || 10000;
+        this.originalCostC = config.costC || 100;
         
         // 🔥 ТЕКУЩИЕ коэффициенты (будут рандомизированы при покупке)
         this.costA = config.costA || 0;
         this.costB = config.costB || 10;
-        this.costC = config.costC || 10000;
+        this.costC = config.costC || 1;
         
         // 🔥 Определяем тип издержек
         this.hasQuadraticCosts = config.costA && config.costA > 0;

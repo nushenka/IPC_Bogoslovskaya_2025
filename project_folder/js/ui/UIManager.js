@@ -412,7 +412,7 @@ class UIManager {
         const success = this.gameEngine.buyCompany(companyId);
         if (success) {
             this.updateUI();
-            alert('Компания успешно куплена! Коэффициенты издержек рандомизированы.');
+            alert('Компания успешно куплена!');
         } else {
             alert('Не удалось купить компанию. Проверьте, хватает ли средств.');
         }

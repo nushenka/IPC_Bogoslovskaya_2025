@@ -14,8 +14,8 @@ const BUSINESS_TYPES = [
         // Издержки: TC = aQ² + bQ + c
         costA: 0.3,      // квадратичный коэффициент
         costB: 800,      // линейный коэффициент
-        costC: 500000,   // постоянные издержки
-        costFormula: 'TC = 0.3Q² + 800Q + 500,000',
+        costC: 5,   // постоянные издержки
+        costFormula: 'TC = 0.3Q² + 800Q + 5',
         
         description: 'Нефтедобывающая компания. Естественная монополия на рынке нефтепродуктов.',
         minPrice: 2000,
@@ -36,8 +36,8 @@ const BUSINESS_TYPES = [
         // Линейные издержки: TC = bQ + c
         costA: 0,        // нет квадратичной части
         costB: 100,      // переменные издержки на единицу
-        costC: 100000,   // постоянные издержки
-        costFormula: 'TC = 100Q + 100,000',
+        costC: 0,   // постоянные издержки
+        costFormula: 'TC = 100Q',
         
         description: 'Строительная компания. Работает в условиях совершенной конкуренции.',
         minPrice: 100,
@@ -57,8 +57,8 @@ const BUSINESS_TYPES = [
         
         costA: 0,
         costB: 60,
-        costC: 80000,
-        costFormula: 'TC = 60Q + 80,000',
+        costC: 8,
+        costFormula: 'TC = 60Q + 8',
         
         description: 'Складской комплекс. Услуги хранения в условиях высокой конкуренции.',
         minPrice: 50,
@@ -79,8 +79,8 @@ const BUSINESS_TYPES = [
         // Ваши издержки
         costA: 0.0004,
         costB: 40,
-        costC: 120000,
-        costFormula: 'TC = 0.0004Q² + 40Q + 120,000',
+        costC: 12,
+        costFormula: 'TC = 0.0004Q² + 40Q + 12',
         
         // Издержки конкурентов (для Штакельберга)
         competitorCosts: [
@@ -107,11 +107,11 @@ const BUSINESS_TYPES = [
         // Все фирмы имеют одинаковые издержки (Курно)
         costA: 0.0006,
         costB: 70,
-        costC: 90000,
-        costFormula: 'TC = 0.0006Q² + 70Q + 90,000',
+        costC: 9,
+        costFormula: 'TC = 0.0006Q² + 70Q + 9',
         
         // Общие издержки для конкурентов
-        commonCompetitorFormula: 'TC = 0.0006Q² + 70Q + 90,000',
+        commonCompetitorFormula: 'TC = 0.0006Q² + 70Q + 9',
         
         description: 'Мобильный оператор. Олигополия Курно (3 фирмы на рынке, одинаковые издержки).',
         minPrice: 100,
@@ -130,8 +130,8 @@ const BUSINESS_TYPES = [
         
         costA: 0.0002,
         costB: 50,
-        costC: 150000,
-        costFormula: 'TC = 0.0002Q² + 50Q + 150,000',
+        costC: 15,
+        costFormula: 'TC = 0.0002Q² + 50Q + 15',
         
         description: 'Таксомоторная служба. Монополия в городе благодаря эксклюзивной лицензии.',
         minPrice: 50,
