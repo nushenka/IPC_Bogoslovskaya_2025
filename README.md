@@ -179,7 +179,7 @@ project/
 │   │   ├── Bank.js             # Банк (кредиты, депозиты)
 │   │   ├── StockMarket.js      # Фондовый рынок
 │   │   ├── EconomicEnvironment.js # Макроэкономическая среда
-│   │   ├── Competitor.js       # AI-конкурент
+│   │   ├── Competitor.js       # Для олигополий
 │   │   ├── Shock.js            # Экономический шок
 │   │   ├── Demand.js           # Модель спроса
 │   │   ├── Cost.js             # Модель издержек
@@ -207,7 +207,7 @@ project/
 │       └── controls/           # Элементы управления
 │           ├── InputManager.js # Управление вводом
 │           ├── ButtonManager.js# Управление кнопками
-│           └── ModalManager.js # Управление модальными окнами
+│           └── ModalManager.js # Управление окнами
 │
 └── assets/
     ├── images/                 # Изображения
