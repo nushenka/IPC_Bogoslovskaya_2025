@@ -6,7 +6,7 @@ export function checkDecision(company, Q, userProfit, env) {
     realProfit,
     isCorrect: diff < 1e-2,
     message: diff < 1e-2
-      ? "✅ Прибыль рассчитана верно"
-      : `❌ Ошибка. Реальная прибыль: ${realProfit.toFixed(2)}`
+      ? " Прибыль рассчитана верно"
+      : ` Ошибка. Реальная прибыль: ${realProfit.toFixed(2)}`
   };
 }

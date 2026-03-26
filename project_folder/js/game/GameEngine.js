@@ -64,7 +64,7 @@ class GameEngine {
         const playerCompany = new Company(company.config);
         playerCompany.ownedByPlayer = true;
         
-        // 🔥 ВАЖНО: Рандомизируем коэффициенты издержек
+        //  ВАЖНО: Рандомизируем коэффициенты издержек
         playerCompany.randomizeCosts();
         
         // Добавляем игроку
