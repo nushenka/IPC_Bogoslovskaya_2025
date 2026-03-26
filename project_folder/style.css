@@ -1,753 +1,852 @@
-/* style.css - ОБНОВЛЕННАЯ ВЕРСИЯ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ═══════════════════════════════════════════════════════════════
+   ВШЭ Экономический Симулятор — Pastel Theme
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Переменные ─────────────────────────────────────────────── */
+:root {
+    --bg-main:       #f0f4ff;
+    --bg-card:       #ffffff;
+    --bg-panel:      #ffffff;
+    --bg-soft:       #f7f9fe;
+
+    --blue:          #6b9ff7;
+    --blue-dark:     #4a7fe6;
+    --blue-light:    #dce9ff;
+
+    --green:         #6fcf97;
+    --green-dark:    #27ae60;
+    --green-light:   #d4f5e4;
+
+    --red:           #f47d7d;
+    --red-dark:      #e74c3c;
+    --red-light:     #fde8e8;
+
+    --purple:        #a78bfa;
+    --purple-dark:   #7c3aed;
+    --purple-light:  #ede9fe;
+
+    --yellow:        #f9c74f;
+    --yellow-dark:   #f39c12;
+    --yellow-light:  #fff8e1;
+
+    --text-main:     #2d3436;
+    --text-mid:      #636e72;
+    --text-soft:     #b2bec3;
+
+    --border:        #e0e7ff;
+    --shadow-sm:     0 2px 8px rgba(107,159,247,0.10);
+    --shadow-md:     0 6px 24px rgba(107,159,247,0.14);
+    --shadow-lg:     0 12px 40px rgba(107,159,247,0.18);
+    --radius:        14px;
+    --radius-sm:     8px;
+    --radius-lg:     20px;
+
+    --font-main:     'Nunito', sans-serif;
+    --font-mono:     'JetBrains Mono', monospace;
 }
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #333;
+    font-family: var(--font-main);
+    background: var(--bg-main);
+    color: var(--text-main);
     min-height: 100vh;
+    /* Фоновый паттерн — мягкая сетка */
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(167,139,250,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(107,159,247,0.12) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c7d7fd' fill-opacity='0.25'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
+/* ── Контейнер ──────────────────────────────────────────────── */
 .game-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    min-height: 100vh;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
-/* Шапка */
+/* ── Шапка ──────────────────────────────────────────────────── */
 .game-header {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+    background: linear-gradient(135deg, #667eea 0%, #a78bfa 100%);
     color: white;
-    padding: 15px 25px;
+    padding: 16px 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(102,126,234,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .player-stats h1 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+    font-weight: 800;
     margin-bottom: 8px;
-    font-weight: 600;
-    color: #f1c40f;
+    letter-spacing: -0.3px;
 }
 
 .stats-row {
     display: flex;
-    gap: 25px;
+    gap: 28px;
 }
 
 .stat-item {
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
 .stat-label {
-    font-size: 0.85rem;
-    opacity: 0.8;
-    margin-bottom: 3px;
+    font-size: 0.78rem;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .stat-value {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
 .economy-stats {
     display: flex;
-    gap: 20px;
-    background: rgba(255,255,255,0.1);
-    padding: 10px 20px;
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
+    gap: 16px;
+    background: rgba(255,255,255,0.18);
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.25);
 }
 
 .economy-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    font-size: 0.9rem;
+    gap: 3px;
 }
 
-.economy-item span:first-child {
-    opacity: 0.9;
+.econ-label {
+    font-size: 0.78rem;
+    opacity: 0.8;
 }
 
-/* Основная область */
+.econ-val {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* ── Основная область ───────────────────────────────────────── */
 .game-main {
     display: flex;
     flex: 1;
     padding: 20px;
-    gap: 20px;
-    background: #f8f9fa;
+    gap: 18px;
+    align-items: flex-start;
 }
 
 .panel {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    border: 1px solid #e9ecef;
+    background: var(--bg-panel);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
 }
 
 .businesses-panel {
-    flex: 0 0 320px;
-    border-top: 4px solid #3498db;
+    flex: 0 0 290px;
+    border-top: 4px solid var(--blue);
 }
 
 .control-panel {
     flex: 1;
-    border-top: 4px solid #2ecc71;
+    border-top: 4px solid var(--green);
+    min-width: 0;
 }
 
 .analytics-panel {
-    flex: 0 0 320px;
-    border-top: 4px solid #9b59b6;
+    flex: 0 0 300px;
+    border-top: 4px solid var(--purple);
+    overflow-y: auto;
+    max-height: calc(100vh - 150px);
 }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f1f3f5;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--bg-soft);
 }
 
 .panel-header h2 {
-    font-size: 1.4rem;
-    color: #2c3e50;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
 }
 
-/* Кнопки */
+/* ── Кнопки ─────────────────────────────────────────────────── */
 .btn {
-    padding: 10px 20px;
+    padding: 10px 18px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    white-space: nowrap;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
+.btn:hover   { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.btn:active  { transform: translateY(0); }
 
-.btn:active {
-    transform: translateY(0);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #2980b9 0%, #1c6ea4 100%);
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    color: white;
-}
-
-.btn-info {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-}
-
-.btn-secondary {
-    background: #95a5a6;
-    color: white;
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-    color: white;
-}
-
-.btn-warning {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    color: white;
-}
-
-.btn-small {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-}
-
-.btn-large {
-    padding: 12px 30px;
-    font-size: 1.1rem;
-    font-weight: 600;
-}
+.btn-primary  { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: white; }
+.btn-danger   { background: linear-gradient(135deg, var(--red), var(--red-dark));   color: white; }
+.btn-info     { background: linear-gradient(135deg, #74b9ff, #0984e3);              color: white; }
+.btn-secondary{ background: #dfe6e9; color: var(--text-mid); }
+.btn-success  { background: linear-gradient(135deg, var(--green), var(--green-dark)); color: white; }
+.btn-warning  { background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)); color: white; }
+.btn-small    { padding: 7px 14px; font-size: 0.85rem; }
+.btn-large    { padding: 13px 28px; font-size: 1rem; }
 
 .btn-disabled {
-    background: #bdc3c7 !important;
+    background: #dfe6e9 !important;
+    color: #b2bec3 !important;
     cursor: not-allowed !important;
-    opacity: 0.6;
-}
-
-.btn-disabled:hover {
+    opacity: 0.7;
     transform: none !important;
     box-shadow: none !important;
 }
 
-/* Компании */
+/* ── Компании ────────────────────────────────────────────────── */
 .companies-list {
-    margin-top: 10px;
-    max-height: 500px;
+    max-height: calc(100vh - 230px);
     overflow-y: auto;
-    padding-right: 5px;
+    padding-right: 4px;
 }
 
 .company-card {
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 15px;
+    background: var(--bg-soft);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    background: white;
+    transition: all 0.2s ease;
 }
 
 .company-card:hover {
-    border-color: #3498db;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.15);
+    border-color: var(--blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
 }
 
 .company-card.selected {
-    border-color: #2ecc71;
-    background: linear-gradient(135deg, #f8fff9 0%, #e8f5e9 100%);
-    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.2);
+    border-color: var(--green);
+    background: var(--green-light);
+    box-shadow: 0 4px 16px rgba(111,207,151,0.25);
 }
 
 .company-header {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .company-icon {
-    font-size: 2rem;
-    width: 50px;
-    height: 50px;
+    font-size: 1.6rem;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-    border-radius: 10px;
+    background: var(--blue-light);
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
 }
 
-.company-title {
-    flex: 1;
-}
+.company-title { flex: 1; min-width: 0; }
 
 .company-title h4 {
-    margin: 0 0 5px 0;
-    color: #2c3e50;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .company-type {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-    background: #f8f9fa;
-    padding: 3px 8px;
+    font-size: 0.76rem;
+    color: var(--text-mid);
+    background: var(--border);
+    padding: 2px 7px;
     border-radius: 4px;
+    display: inline-block;
+    margin-top: 3px;
 }
 
 .company-profit {
-    font-weight: bold;
-    font-size: 1.1rem;
-    padding: 5px 12px;
-    border-radius: 6px;
-    background: #f8f9fa;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
 }
 
-.profit-positive {
-    color: #27ae60;
-    background: rgba(39, 174, 96, 0.1);
-}
-
-.profit-negative {
-    color: #e74c3c;
-    background: rgba(231, 76, 60, 0.1);
-}
+.profit-positive { color: var(--green-dark); background: var(--green-light); }
+.profit-negative { color: var(--red-dark);   background: var(--red-light);   }
 
 .company-details {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    margin: 15px 0;
+    background: white;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    margin: 10px 0;
 }
 
 .detail-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #e9ecef;
+    align-items: flex-start;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--bg-soft);
+    font-size: 0.88rem;
+    gap: 8px;
 }
 
-.detail-row:last-child {
-    border-bottom: none;
-}
+.detail-row:last-child { border-bottom: none; }
 
 .detail-value {
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-main);
+    text-align: right;
 }
 
 .btn-select-company {
     width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
+    padding: 9px;
+    background: var(--blue-light);
+    color: var(--blue-dark);
+    border: 2px solid var(--blue);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 0.88rem;
+    transition: all 0.2s;
 }
 
 .btn-select-company:hover {
-    background: linear-gradient(135deg, #2980b9 0%, #1c6ea4 100%);
-    transform: translateY(-2px);
+    background: var(--blue);
+    color: white;
 }
 
 .empty-message {
     text-align: center;
-    padding: 50px 20px;
-    color: #7f8c8d;
-    font-style: italic;
-    font-size: 1.1rem;
+    padding: 40px 20px;
+    color: var(--text-soft);
+    font-size: 0.95rem;
 }
 
-/* Управление */
-.business-controls {
-    animation: fadeIn 0.3s ease;
+/* ── Управление ─────────────────────────────────────────────── */
+.selected-name {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--text-main);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.no-company-message {
-    text-align: center;
-    padding: 60px 20px;
-    color: #7f8c8d;
-}
-
-.no-company-message h3 {
-    margin-bottom: 10px;
-    color: #2c3e50;
-}
-
-.no-company-message p {
-    font-size: 1rem;
-    opacity: 0.8;
+.controls-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
 }
 
 .control-group {
-    margin-bottom: 25px;
+    flex: 1;
+    min-width: 180px;
 }
 
 .control-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 600;
-    color: #2c3e50;
-    font-size: 1rem;
+    font-size: 0.88rem;
+    color: var(--text-mid);
 }
 
 .input-with-button {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     align-items: center;
 }
 
 .input-with-button input {
     flex: 1;
-    padding: 12px 15px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s;
+    padding: 9px 12px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    background: var(--bg-soft);
 }
 
 .input-with-button input:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    border-color: var(--blue);
+    background: white;
+}
+
+.input-with-button input:disabled {
+    background: #f1f4fd;
+    color: var(--text-soft);
+    cursor: not-allowed;
+}
+
+.input-badge {
+    background: var(--purple-light);
+    color: var(--purple-dark);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .control-buttons {
     display: flex;
-    gap: 12px;
-    margin-top: 30px;
+    gap: 10px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
 }
 
-/* Детали компании */
-.company-details-panel {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 12px;
-    margin-top: 25px;
-    border-left: 4px solid #3498db;
-    animation: slideIn 0.3s ease;
+/* ── График ──────────────────────────────────────────────────── */
+.chart-container {
+    height: 220px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 12px;
+    margin-bottom: 16px;
 }
 
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
+/* ── Детали компании ─────────────────────────────────────────── */
+.company-details-panel {
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    padding: 20px;
+    border-left: 4px solid var(--blue);
+    animation: fadeIn 0.3s ease;
 }
 
 .company-details-panel h4 {
-    margin-bottom: 20px;
-    color: #2c3e50;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-main);
 }
 
 .simple-details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
 }
 
 .detail-item {
     background: white;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
 }
 
 .detail-label {
     display: block;
-    font-size: 0.9rem;
-    color: #7f8c8d;
-    margin-bottom: 5px;
-}
-
-/* Футер */
-.game-footer {
-    background: white;
-    padding: 20px 25px;
-    border-top: 1px solid #e9ecef;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-}
-
-.footer-left, .footer-right {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.footer-center {
-    flex: 1;
-    text-align: center;
-}
-
-.round-status {
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 1rem;
-    background: #f8f9fa;
-    padding: 8px 20px;
-    border-radius: 20px;
-    display: inline-block;
-}
-
-/* Модальные окна */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-    animation: fadeInOverlay 0.3s ease;
-}
-
-@keyframes fadeInOverlay {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    max-width: 700px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    animation: modalSlideIn 0.3s ease;
-}
-
-@keyframes modalSlideIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-header {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.modal-header h3 {
-    font-size: 1.6rem;
-    color: #2c3e50;
-    margin-bottom: 10px;
-}
-
-.modal-subtitle {
-    color: #7f8c8d;
-    font-size: 1rem;
-}
-
-.modal-body {
-    margin: 25px 0;
-}
-
-.companies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-.company-option {
-    background: white;
-    border: 2px solid #e9ecef;
-    border-radius: 15px;
-    padding: 25px;
-    transition: all 0.3s ease;
-}
-
-.company-option:hover {
-    border-color: #3498db;
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(52, 152, 219, 0.15);
-}
-
-.company-option.disabled {
-    opacity: 0.6;
-}
-
-.company-option.disabled:hover {
-    transform: none;
-    border-color: #e9ecef;
-    box-shadow: none;
-}
-
-.company-option-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.company-option-header h4 {
-    font-size: 1.3rem;
-    color: #2c3e50;
-    margin-bottom: 5px;
-}
-
-.company-price {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #27ae60;
-}
-
-.company-description {
-    color: #7f8c8d;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-}
-
-.modal-footer {
-    text-align: center;
-    margin-top: 25px;
-    padding-top: 25px;
-    border-top: 1px solid #e9ecef;
-}
-
-/* Аналитика */
-.analytics-placeholder {
-    text-align: center;
-    padding: 40px 20px;
-    color: #7f8c8d;
-    font-style: italic;
-}
-
-.quick-analytics {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #e9ecef;
-}
-
-/* Полоса прокрутки */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Адаптивность */
-@media (max-width: 1200px) {
-    .game-main {
-        flex-direction: column;
-    }
-    
-    .businesses-panel,
-    .analytics-panel {
-        flex: 0 0 auto;
-        width: 100%;
-    }
-    
-    .companies-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .game-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .economy-stats {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .game-footer {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .footer-left, .footer-right, .footer-center {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .control-buttons {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .companies-grid {
-        grid-template-columns: 1fr;
-    }
-}
-.formula-row {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px dashed #e9ecef;
-}
-
-.formula-label {
-    font-size: 0.9em;
-    color: #7f8c8d;
-}
-
-.formula-value {
-    font-size: 0.9em;
-    font-family: 'Courier New', monospace;
-    color: #e74c3c;
-    background: #f8f9fa;
-    padding: 3px 6px;
-    border-radius: 3px;
-    display: inline-block;
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 .formula-item {
     grid-column: span 2;
-    margin-top: 10px;
 }
 
 .formula-demand {
-    font-family: 'Courier New', monospace;
-    color: #3498db;
-    background: #f8f9fa;
-    padding: 5px 10px;
-    border-radius: 5px;
-    border-left: 3px solid #3498db;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--blue-dark);
+    background: var(--blue-light);
+    padding: 4px 10px;
+    border-radius: 4px;
+    border-left: 3px solid var(--blue);
+    display: inline-block;
+    word-break: break-all;
 }
 
 .formula-cost {
-    font-family: 'Courier New', monospace;
-    color: #e74c3c;
-    background: #f8f9fa;
-    padding: 5px 10px;
-    border-radius: 5px;
-    border-left: 3px solid #e74c3c;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--red-dark);
+    background: var(--red-light);
+    padding: 4px 10px;
+    border-radius: 4px;
+    border-left: 3px solid var(--red);
+    display: inline-block;
+    word-break: break-all;
 }
 
-/* Для структуры компании в модалке */
+.formula-row { align-items: flex-start; }
+.formula-label { font-size: 0.85rem; color: var(--text-mid); }
+.formula-value {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--red-dark);
+    background: var(--red-light);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* ── Проверка прибыли ────────────────────────────────────────── */
+.profit-checker {
+    margin-top: 16px;
+    background: var(--yellow-light);
+    border-radius: var(--radius);
+    padding: 16px;
+    border-left: 4px solid var(--yellow-dark);
+}
+
+.profit-checker h4 {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.check-correct {
+    background: var(--green-light);
+    color: var(--green-dark);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.check-wrong {
+    background: var(--red-light);
+    color: var(--red-dark);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.check-wrong small {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+/* ── Нет компании ────────────────────────────────────────────── */
+.no-company-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-soft);
+}
+
+.no-company-icon {
+    font-size: 3.5rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.no-company-message h3 { color: var(--text-mid); margin-bottom: 8px; font-size: 1.1rem; }
+.no-company-message p  { font-size: 0.9rem; }
+
+/* ── Аналитика ───────────────────────────────────────────────── */
+.quick-analytics {
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--border);
+}
+
+.analytics-placeholder {
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+}
+
+.analytics-summary h3 {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* ── Золотовалютный рынок ────────────────────────────────────── */
+.panel-section { }
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+}
+
+.metal-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+}
+
+.metal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.metal-price {
+    color: var(--blue-dark);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+.metal-qty {
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    margin-bottom: 10px;
+}
+
+.metal-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.metal-input {
+    width: 64px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-family: var(--font-main);
+    background: white;
+}
+
+.insider-active {
+    background: var(--purple-light);
+    color: var(--purple-dark);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.insider-inactive {
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    padding-top: 4px;
+}
+
+/* ── Футер ───────────────────────────────────────────────────── */
+.game-footer {
+    background: white;
+    padding: 14px 28px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
+}
+
+.footer-left, .footer-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.footer-center { flex: 1; text-align: center; }
+
+.round-status {
+    font-weight: 600;
+    color: var(--text-mid);
+    font-size: 0.9rem;
+    background: var(--bg-soft);
+    padding: 7px 18px;
+    border-radius: 20px;
+    display: inline-block;
+    border: 1px solid var(--border);
+}
+
+/* ── Модальные окна ──────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(45,52,54,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(6px);
+    animation: fadeInOverlay 0.25s ease;
+}
+
+@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-content {
+    background: white;
+    padding: 28px;
+    border-radius: var(--radius-lg);
+    max-width: 720px;
+    width: 92%;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.25s ease;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header { text-align: center; margin-bottom: 20px; }
+.modal-header h3 { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+.modal-subtitle  { color: var(--text-mid); font-size: 0.95rem; margin-top: 6px; }
+
+.modal-body { margin: 20px 0; }
+
+.companies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.company-option {
+    background: var(--bg-soft);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: all 0.2s ease;
+}
+
+.company-option:hover {
+    border-color: var(--blue);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-sm);
+}
+
+.company-option.disabled { opacity: 0.55; }
+.company-option.disabled:hover { transform: none; border-color: var(--border); box-shadow: none; }
+
+.company-option-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.company-option-header h4 { font-size: 1.1rem; font-weight: 700; }
+
+.company-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--green-dark);
+}
+
+.company-description {
+    color: var(--text-mid);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
 .company-structure {
-    font-size: 0.85em;
-    color: #7f8c8d;
+    font-size: 0.8rem;
+    color: var(--text-mid);
     margin-top: 2px;
 }
 
-/* Улучшаем отображение типа компании */
-.company-type {
-    font-size: 0.85em;
-    color: #7f8c8d;
-    background: #f8f9fa;
-    padding: 3px 8px;
-    border-radius: 4px;
-    display: inline-block;
-    margin-top: 3px;
+.modal-footer {
+    text-align: center;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+/* ── Тост ────────────────────────────────────────────────────── */
+.game-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 0.95rem;
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast-success { background: var(--green-dark); color: white; }
+.toast-error   { background: var(--red-dark);   color: white; }
+
+/* ── Анимации ────────────────────────────────────────────────── */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.business-controls { animation: fadeIn 0.25s ease; }
+
+/* ── Скроллбар ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-soft); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+
+/* ── Адаптивность ────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+    .game-main { flex-direction: column; }
+    .businesses-panel, .analytics-panel { flex: 0 0 auto; width: 100%; max-height: none; }
+}
+
+@media (max-width: 768px) {
+    .game-header { flex-direction: column; gap: 12px; }
+    .economy-stats { flex-wrap: wrap; justify-content: center; }
+    .game-footer { flex-direction: column; gap: 10px; }
+    .footer-left, .footer-right, .footer-center { width: 100%; justify-content: center; }
+    .companies-grid { grid-template-columns: 1fr; }
+    .controls-row { flex-direction: column; }
+    .formula-item { grid-column: span 1; }
 }
