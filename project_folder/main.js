@@ -1,24 +1,17 @@
-// main.js
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM загружен, начинаем инициализацию...');
-    
+import { GameEngine } from "./js/game/GameEngine.js";
+import { UIManager } from "./js/ui/UIManager.js";
+
+document.addEventListener("DOMContentLoaded", () => {
     try {
-        // Создаем экземпляры
         const gameEngine = new GameEngine();
-        const uiManager = new UIManager(gameEngine);
-        
-        // Инициализируем игру
         gameEngine.initialize();
+
+        const uiManager = new UIManager(gameEngine);
         uiManager.initialize();
-        
-        // Делаем глобально доступными для отладки
-        window.gameEngine = gameEngine;
-        window.uiManager = uiManager;
-        
-        console.log('Игра успешно запущена!');
-        
+
+        console.log("Игра успешно запущена");
     } catch (error) {
-        console.error('Критическая ошибка при запуске игры:', error);
-        alert('Ошибка загрузки игры: ' + error.message);
+        console.error("Критическая ошибка при запуске:", error);
+        alert("Ошибка загрузки игры: " + error.message);
     }
 });

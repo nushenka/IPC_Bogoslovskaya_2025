@@ -114,5 +114,8 @@ class Bank {
     }
 }
 
-// Делаем доступным глобально
-window.Bank = Bank;
+export { Bank };
+
+if (typeof window !== "undefined") {
+    window.Bank = Bank;
+}

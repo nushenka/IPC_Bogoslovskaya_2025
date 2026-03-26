@@ -27,5 +27,8 @@ class EconomicEnvironment {
     }
 }
 
-// Делаем доступным глобально
-window.EconomicEnvironment = EconomicEnvironment;
+export { EconomicEnvironment };
+
+if (typeof window !== "undefined") {
+    window.EconomicEnvironment = EconomicEnvironment;
+}

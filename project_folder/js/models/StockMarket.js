@@ -1,127 +1,115 @@
-// js/models/StockMarket.js
+import { SHOCKS, STOCK_MARKET } from "../config/constants.js";
+
 class StockMarket {
     constructor() {
-        this.stocks = {};
-        this.metals = {};
-        this.insiderInfo = {};
-        this.history = [];
         this.currentRound = 1;
-        this.initialize();
-    }
-    
-    initialize() {
-        // Инициализируем металлы
         this.metals = {
             gold: {
-                name: 'Золото',
-                icon: '🥇',
+                name: STOCK_MARKET.gold.name,
                 currentPrice: STOCK_MARKET.gold.basePrice,
-                basePrice: STOCK_MARKET.gold.basePrice,
+                minPrice: STOCK_MARKET.gold.minPrice,
+                maxPrice: STOCK_MARKET.gold.maxPrice,
                 volatility: STOCK_MARKET.gold.volatility,
                 quantity: 0
             },
             platinum: {
-                name: 'Платина',
-                icon: '🥈',
+                name: STOCK_MARKET.platinum.name,
                 currentPrice: STOCK_MARKET.platinum.basePrice,
-                basePrice: STOCK_MARKET.platinum.basePrice,
+                minPrice: STOCK_MARKET.platinum.minPrice,
+                maxPrice: STOCK_MARKET.platinum.maxPrice,
                 volatility: STOCK_MARKET.platinum.volatility,
                 quantity: 0
             }
         };
-        
-        // Инициализируем инсайдерскую информацию
         this.insiderInfo = {
             hasInfo: false,
             roundsRemaining: 0,
-            revealedShock: null
+            revealedShock: null,
+            purchaseRound: null
         };
-        
-        console.log('Биржа инициализирована');
     }
-    
-    // Обновить цены на бирже
+
     update() {
-        // Обновляем цены металлов
-        Object.keys(this.metals).forEach(metal => {
-            const change = (Math.random() - 0.5) * 2 * this.metals[metal].volatility;
-            this.metals[metal].currentPrice *= (1 + change);
-            this.metals[metal].currentPrice = Math.max(
-                this.metals[metal].basePrice * 0.5,
-                Math.min(this.metals[metal].basePrice * 2, this.metals[metal].currentPrice)
+        this.currentRound += 1;
+
+        Object.values(this.metals).forEach((metal) => {
+            const delta = (Math.random() * 2 - 1) * metal.volatility;
+            const nextPrice = metal.currentPrice * (1 + delta);
+            metal.currentPrice = Math.round(
+                Math.max(metal.minPrice, Math.min(metal.maxPrice, nextPrice))
             );
         });
-        
-        // Обновляем инсайдерскую информацию
-        if (this.insiderInfo.hasInfo && this.insiderInfo.roundsRemaining > 0) {
-            this.insiderInfo.roundsRemaining--;
-            if (this.insiderInfo.roundsRemaining === 0) {
-                this.insiderInfo.hasInfo = false;
-                this.insiderInfo.revealedShock = null;
+
+        if (this.insiderInfo.hasInfo) {
+            this.insiderInfo.roundsRemaining -= 1;
+            if (this.insiderInfo.roundsRemaining <= 0) {
+                this.insiderInfo = {
+                    hasInfo: false,
+                    roundsRemaining: 0,
+                    revealedShock: null,
+                    purchaseRound: null
+                };
             }
         }
-        
-        this.currentRound++;
     }
-    
-    // Купить металл
+
     buyMetal(metalType, quantity, playerCapital) {
         const metal = this.metals[metalType];
-        if (!metal) return false;
-        
-        const totalCost = metal.currentPrice * quantity;
-        if (playerCapital >= totalCost) {
-            metal.quantity += quantity;
-            return {
-                success: true,
-                cost: totalCost,
-                newPrice: metal.currentPrice
-            };
+        if (!metal || quantity <= 0) {
+            return { success: false, message: "Металл не найден" };
         }
-        return { success: false, cost: totalCost };
+
+        const totalCost = metal.currentPrice * quantity;
+        if (playerCapital < totalCost) {
+            return { success: false, cost: totalCost };
+        }
+
+        metal.quantity += quantity;
+        return {
+            success: true,
+            cost: totalCost,
+            newPrice: metal.currentPrice
+        };
     }
-    
-    // Продать металл
+
     sellMetal(metalType, quantity) {
         const metal = this.metals[metalType];
-        if (!metal || metal.quantity < quantity) return false;
-        
+        if (!metal || quantity <= 0 || metal.quantity < quantity) {
+            return { success: false };
+        }
+
         const totalValue = metal.currentPrice * quantity;
         metal.quantity -= quantity;
-        
+
         return {
             success: true,
             value: totalValue,
             newPrice: metal.currentPrice
         };
     }
-    
-    // Купить инсайдерскую информацию
+
     buyInsiderInfo(playerCapital) {
         const cost = STOCK_MARKET.insiderInfo.basePrice;
-        
-        if (playerCapital >= cost && !this.insiderInfo.hasInfo) {
-            // Выбираем случайный будущий шок
-            const futureShock = SHOCKS[Math.floor(Math.random() * SHOCKS.length)];
-            
-            this.insiderInfo = {
-                hasInfo: true,
-                roundsRemaining: 3,
-                revealedShock: futureShock,
-                purchaseRound: this.currentRound
-            };
-            
-            return {
-                success: true,
-                cost: cost,
-                shock: futureShock
-            };
+
+        if (playerCapital < cost || this.insiderInfo.hasInfo || SHOCKS.length === 0) {
+            return { success: false, cost };
         }
-        
-        return { success: false, cost: cost };
+
+        const futureShock = SHOCKS[Math.floor(Math.random() * SHOCKS.length)];
+        this.insiderInfo = {
+            hasInfo: true,
+            roundsRemaining: STOCK_MARKET.insiderInfo.duration,
+            revealedShock: futureShock,
+            purchaseRound: this.currentRound
+        };
+
+        return {
+            success: true,
+            cost,
+            shock: futureShock
+        };
     }
-    
-    // Получить состояние биржи
+
     getState() {
         return {
             metals: this.metals,
@@ -129,29 +117,10 @@ class StockMarket {
             currentRound: this.currentRound
         };
     }
-    
-    // Получить портфель игрока
-    getPlayerPortfolio() {
-        let totalValue = 0;
-        const portfolio = {};
-        
-        Object.keys(this.metals).forEach(metal => {
-            portfolio[metal] = {
-                quantity: this.metals[metal].quantity,
-                currentPrice: this.metals[metal].currentPrice,
-                totalValue: this.metals[metal].quantity * this.metals[metal].currentPrice
-            };
-            totalValue += portfolio[metal].totalValue;
-        });
-        
-        return {
-            portfolio: portfolio,
-            totalValue: totalValue,
-            hasInsiderInfo: this.insiderInfo.hasInfo,
-            insiderInfo: this.insiderInfo.revealedShock
-        };
-    }
 }
 
-// Делаем доступным глобально
-window.StockMarket = StockMarket;
+export { StockMarket };
+
+if (typeof window !== "undefined") {
+    window.StockMarket = StockMarket;
+}

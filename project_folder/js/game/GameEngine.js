@@ -1,4 +1,12 @@
 // js/game/GameEngine.js
+import { BUSINESS_TYPES } from "../config/businessConfig.js";
+import { SHOCKS } from "../config/constants.js";
+import { Bank } from "../models/Bank.js";
+import { Company } from "../models/Company.js";
+import { EconomicEnvironment } from "../models/EconomicEnvironment.js";
+import { Player } from "../models/Player.js";
+import { StockMarket } from "../models/StockMarket.js";
+
 class GameEngine {
     constructor() {
         this.currentRound = 1;
@@ -128,6 +136,10 @@ class GameEngine {
         if (updates.production !== undefined) {
             company.setProduction(updates.production);
         }
+
+        if (updates.expectedProfit !== undefined) {
+            company.setExpectedProfit(updates.expectedProfit);
+        }
         
         return true;
     }
@@ -200,18 +212,19 @@ class GameEngine {
             }
         }
         
-        // 4. Рассчитываем прибыль для каждой компании
+        // 4. Рассчитываем результаты компаний по сохранённым решениям игрока
         let totalProfit = 0;
         const companyProfits = [];
+        const decisionReports = [];
         
         this.player.companies.forEach(company => {
-            // Обновляем шоки у компании
             company.updateShocks();
-            
-            // Рассчитываем прибыль с учетом текущих налогов
-            const profit = company.calculateProfit(this.economy.taxRate);
+
+            const report = company.resolveRoundDecision(this.economy.taxRate, this.currentRound);
+            const profit = report.actualProfit || 0;
             totalProfit += profit;
-            
+            decisionReports.push(report);
+
             companyProfits.push({
                 name: company.name,
                 profit: profit,
@@ -238,6 +251,7 @@ class GameEngine {
             round: this.currentRound - 1,
             totalProfit: totalProfit,
             companyProfits: companyProfits,
+            decisionReports: decisionReports,
             companies: this.player.companies,
             economy: this.economy.getCurrentState(),
             bank: this.bank.getLoanInfo(),
@@ -308,5 +322,8 @@ class GameEngine {
     }
 }
 
-// Делаем доступным глобально
-window.GameEngine = GameEngine;
+export { GameEngine };
+
+if (typeof window !== "undefined") {
+    window.GameEngine = GameEngine;
+}

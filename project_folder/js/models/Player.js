@@ -26,5 +26,8 @@ class Player {
     }
 }
 
-// Делаем доступным глобально
-window.Player = Player;
+export { Player };
+
+if (typeof window !== "undefined") {
+    window.Player = Player;
+}
