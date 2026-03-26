@@ -22,9 +22,6 @@ class UIManager {
 
         document.getElementById("btnBuyCompany")?.addEventListener("click", () => this.showBuyCompanyModal());
         document.getElementById("btnSellCompany")?.addEventListener("click", () => this.sellSelectedCompany());
-        document.getElementById("btnCompanyDetails")?.addEventListener("click", () => this.showCompanyDetails());
-        document.getElementById("btnSaveGame")?.addEventListener("click", () => this.saveGame());
-        document.getElementById("btnLoadGame")?.addEventListener("click", () => this.loadGame());
 
         document.getElementById("btnBuyGold")?.addEventListener("click", () => this.buyMetal("gold"));
         document.getElementById("btnSellGold")?.addEventListener("click", () => this.sellMetal("gold"));
@@ -39,6 +36,7 @@ class UIManager {
         this.updateEconomyStats(state);
         this.updateCompaniesList(state);
         this.updateControlPanel();
+        this.updateShockPanel(state);
         this.updateStockMarketPanel(state);
     }
 
@@ -63,6 +61,31 @@ class UIManager {
         set("inflationRate", `${state.economy.inflation.toFixed(1)}%`);
         set("interestRate", `${state.economy.interestRate.toFixed(1)}%`);
         set("taxRate", `${state.economy.taxRate}%`);
+    }
+
+    updateShockPanel(state) {
+        const container = document.getElementById("shockSidebar");
+        if (!container) return;
+
+        const shocks = state.activeShocks || [];
+        if (!shocks.length) {
+            container.innerHTML = `
+            <div class="analytics-placeholder">
+                <p>${state.round < 2 ? "Со второго раунда здесь будут появляться рыночные шоки" : "Сейчас активных шоков нет"}</p>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = shocks.map((shock) => `
+            <div class="shock-card">
+                <h4>${shock.name}</h4>
+                <p>${shock.description || "Рыночный шок влияет на коэффициенты компаний и макроэкономику."}</p>
+                <div class="shock-meta">
+                    <span>${shock.target === "all" ? "Вся экономика" : "Цель: " + shock.target}</span>
+                    <span class="shock-badge">Ещё ${shock.roundsRemaining} раунд.</span>
+                </div>
+            </div>
+        `).join("");
     }
 
     updateCompaniesList(state) {
@@ -187,6 +210,10 @@ class UIManager {
             <div class="detail-item formula-item">
                 <span class="detail-label">Функция издержек:</span>
                 <span class="detail-value formula-cost">${info.costFormula}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Важно:</span>
+                <span class="detail-value">Не забудьте учесть налог текущего раунда в своих расчётах.</span>
             </div>
             ${competitorHtml}
             ${pendingText}
@@ -507,6 +534,10 @@ class UIManager {
     }
 
     showDecisionNotifications(result) {
+        if (result?.newShock) {
+            this.showToast(`Новый шок: ${result.newShock.name}`, "error");
+        }
+
         if (!result?.decisionReports?.length) return;
 
         result.decisionReports
@@ -535,19 +566,6 @@ class UIManager {
         }, 2600);
     }
 
-    saveGame() {
-        const state = this.gameEngine.getGameState();
-        localStorage.setItem("econSave", JSON.stringify({
-            round: state.round,
-            capital: state.player.capital,
-            netWorth: state.player.netWorth
-        }));
-        this.showToast("Игра сохранена");
-    }
-
-    loadGame() {
-        this.showToast("Загрузка пока недоступна", "error");
-    }
 }
 
 export { UIManager };

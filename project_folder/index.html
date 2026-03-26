@@ -64,7 +64,6 @@
 
                 <div class="control-buttons">
                     <button id="btnSellCompany" class="btn btn-danger btn-small">🗑 Продать</button>
-                    <button id="btnCompanyDetails" class="btn btn-info btn-small">📊 Детали</button>
                 </div>
 
                 <div class="chart-container">
@@ -88,6 +87,15 @@
             <div id="quickAnalytics" class="quick-analytics">
                 <div class="analytics-placeholder">
                     <p>Нажмите «Следующий раунд» для начала</p>
+                </div>
+            </div>
+
+            <div class="panel-section shock-section" style="margin-top:20px;">
+                <h3 class="section-title">⚡ Шоки рынка</h3>
+                <div id="shockSidebar" class="shock-sidebar">
+                    <div class="analytics-placeholder">
+                        <p>Со второго раунда здесь будут появляться рыночные шоки</p>
+                    </div>
                 </div>
             </div>
 
@@ -134,10 +142,7 @@
     </main>
 
     <footer class="game-footer">
-        <div class="footer-left">
-            <button id="btnSaveGame" class="btn btn-secondary btn-small">💾 Сохранить</button>
-            <button id="btnLoadGame" class="btn btn-secondary btn-small">📂 Загрузить</button>
-        </div>
+        <div class="footer-left"></div>
         <div class="footer-center">
             <span id="roundStatus" class="round-status">Готов к игре</span>
         </div>

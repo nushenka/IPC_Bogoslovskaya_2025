@@ -183,6 +183,8 @@ class GameEngine {
         this.player.companies.forEach(company => {
             company.applyShock(shock);
         });
+
+        this.economy.applyShock(shock);
         
         return shock;
     }
@@ -203,23 +205,29 @@ class GameEngine {
         // 2. Обновляем банк и биржу
         this.bank.update();
         this.stockMarket.update();
+
+        // 3. Сначала уменьшаем срок жизни уже действующих шоков
+        this.player.companies.forEach(company => {
+            company.updateShocks();
+        });
+        this.updateActiveShocks();
         
-        // 3. Проверяем, нужно ли применить новый шок (30% вероятность)
-        if (Math.random() < 0.3 && SHOCKS && SHOCKS.length > 0) {
+        // 4. Со второго раунда шок появляется гарантированно
+        let newShock = null;
+        if (this.currentRound >= 2 && SHOCKS && SHOCKS.length > 0) {
             const shock = this.getRandomShock();
             if (shock) {
                 this.applyShock(shock);
+                newShock = shock;
             }
         }
         
-        // 4. Рассчитываем результаты компаний по сохранённым решениям игрока
+        // 5. Рассчитываем результаты компаний по сохранённым решениям игрока
         let totalProfit = 0;
         const companyProfits = [];
         const decisionReports = [];
         
         this.player.companies.forEach(company => {
-            company.updateShocks();
-
             const report = company.resolveRoundDecision(this.economy.taxRate, this.currentRound);
             const profit = report.actualProfit || 0;
             totalProfit += profit;
@@ -234,12 +242,9 @@ class GameEngine {
             });
         });
         
-        // 5. Обновляем капитал игрока
+        // 6. Обновляем капитал игрока
         this.player.capital += totalProfit;
         this.player.netWorth = this.player.calculateNetWorth();
-        
-        // 6. Обновляем активные шоки
-        this.updateActiveShocks();
         
         console.log(`Итог раунда ${this.currentRound}:`);
         console.log(`Общая прибыль: ${totalProfit.toLocaleString()}₽`);
@@ -250,6 +255,7 @@ class GameEngine {
         return {
             round: this.currentRound - 1,
             totalProfit: totalProfit,
+            newShock: newShock,
             companyProfits: companyProfits,
             decisionReports: decisionReports,
             companies: this.player.companies,

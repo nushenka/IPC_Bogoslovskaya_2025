@@ -3,16 +3,16 @@ export const BUSINESS_TYPES = [
         id: "vshe_neft",
         name: "ВШЭнефть",
         icon: "🛢️",
-        basePrice: 3000000,
+        basePrice: 1200000,
         marketType: "monopoly",
-        demandA: 10,
+        demandA: 60,
         demandB: 1,
-        costA: 1,
-        costB: 0,
+        costA: 2,
+        costB: 6,
         costC: 0,
         description: "Нефтедобывающая компания. Работает как монополист на рынке.",
         minPrice: 1,
-        maxPrice: 10
+        maxPrice: 60
     },
     {
         id: "vshe_stroy",
@@ -25,10 +25,10 @@ export const BUSINESS_TYPES = [
         demandB: 1,
         costA: 0,
         costB: 10,
-        costC: 0,
+        costC: 120,
         description: "Строительная компания. Работает в условиях совершенной конкуренции.",
         minPrice: 10,
-        maxPrice: 90
+        maxPrice: 100
     },
     {
         id: "vshe_sklad",
@@ -41,10 +41,10 @@ export const BUSINESS_TYPES = [
         demandB: 1,
         costA: 0,
         costB: 8,
-        costC: 100,
+        costC: 80,
         description: "Складской комплекс. Услуги хранения в условиях высокой конкуренции.",
         minPrice: 8,
-        maxPrice: 72
+        maxPrice: 80
     },
     {
         id: "vshe_magazin",
@@ -53,35 +53,36 @@ export const BUSINESS_TYPES = [
         basePrice: 600000,
         marketType: "stackelberg_leader",
         competitors: 1,
-        demandA: 30,
+        demandA: 50,
         demandB: 1,
-        costA: 0,
-        costB: 15,
+        costA: 1,
+        costB: 8,
         costC: 0,
-        competitorCostB: 10,
+        competitorCostA: 1,
+        competitorCostB: 6,
         competitorCostC: 0,
         description: "Сеть магазинов. Работает в модели олигополии Штакельберга.",
         minPrice: 1,
-        maxPrice: 29
+        maxPrice: 50
     },
     {
         id: "vshe_line",
         name: "ВШЭЛайн",
         icon: "📱",
-        basePrice: 700000,
+        basePrice: 750000,
         marketType: "cournot",
         competitors: 1,
         demandA: 100,
         demandB: 1,
         costA: 2,
-        costB: 0,
+        costB: 4,
         costC: 0,
         competitorCostA: 1,
-        competitorCostB: 0,
+        competitorCostB: 4,
         competitorCostC: 0,
         description: "Мобильный оператор. Работает в модели олигополии Курно.",
-        minPrice: 1,
-        maxPrice: 99
+        minPrice: 4,
+        maxPrice: 100
     },
     {
         id: "vshe_taxi",
@@ -89,13 +90,13 @@ export const BUSINESS_TYPES = [
         icon: "🚕",
         basePrice: 800000,
         marketType: "monopoly",
-        demandA: 150,
-        demandB: 3,
-        costA: 2,
-        costB: 30,
-        costC: 200,
+        demandA: 90,
+        demandB: 2,
+        costA: 1,
+        costB: 12,
+        costC: 0,
         description: "Таксомоторная служба. Монополия в городе благодаря эксклюзивной лицензии.",
-        minPrice: 5,
-        maxPrice: 145
+        minPrice: 6,
+        maxPrice: 90
     }
 ];

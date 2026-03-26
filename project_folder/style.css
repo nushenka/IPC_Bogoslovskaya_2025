@@ -519,6 +519,52 @@ body {
     border-radius: 4px;
 }
 
+.shock-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.shock-card {
+    background: linear-gradient(135deg, #fff7e6 0%, #ffffff 100%);
+    border: 1px solid #ffe3b0;
+    border-left: 4px solid var(--yellow-dark);
+    border-radius: var(--radius);
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+}
+
+.shock-card h4 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: var(--text-main);
+}
+
+.shock-card p {
+    font-size: 0.84rem;
+    color: var(--text-mid);
+    line-height: 1.45;
+    margin-bottom: 8px;
+}
+
+.shock-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--text-mid);
+}
+
+.shock-badge {
+    background: var(--yellow-light);
+    color: var(--yellow-dark);
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-weight: 700;
+}
+
 /* ── Проверка прибыли ────────────────────────────────────────── */
 .profit-checker {
     margin-top: 16px;

@@ -7,20 +7,31 @@ class Company {
         this.basePrice = config.basePrice || 100000;
         this.config = config;
 
-        this.demandA = Number(config.demandA || 100);
-        this.demandB = Number(config.demandB || 1);
+        this.baseDemandA = Number(config.demandA || 100);
+        this.baseDemandB = Number(config.demandB || 1);
+        this.demandA = this.baseDemandA;
+        this.demandB = this.baseDemandB;
 
         this.originalCostA = Number(config.costA || 0);
         this.originalCostB = Number(config.costB || 0);
         this.originalCostC = Number(config.costC || 0);
 
-        this.costA = this.originalCostA;
-        this.costB = this.originalCostB;
-        this.costC = this.originalCostC;
+        this.baseCostA = this.originalCostA;
+        this.baseCostB = this.originalCostB;
+        this.baseCostC = this.originalCostC;
+        this.costA = this.baseCostA;
+        this.costB = this.baseCostB;
+        this.costC = this.baseCostC;
 
-        this.competitorCostA = Number(config.competitorCostA || 0);
-        this.competitorCostB = Number(config.competitorCostB || 0);
-        this.competitorCostC = Number(config.competitorCostC || 0);
+        this.originalCompetitorCostA = Number(config.competitorCostA || 0);
+        this.originalCompetitorCostB = Number(config.competitorCostB || 0);
+        this.originalCompetitorCostC = Number(config.competitorCostC || 0);
+        this.baseCompetitorCostA = this.originalCompetitorCostA;
+        this.baseCompetitorCostB = this.originalCompetitorCostB;
+        this.baseCompetitorCostC = this.originalCompetitorCostC;
+        this.competitorCostA = this.baseCompetitorCostA;
+        this.competitorCostB = this.baseCompetitorCostB;
+        this.competitorCostC = this.baseCompetitorCostC;
 
         this.marketStructure = config.marketStructure || config.marketType || "perfect_competition";
         this.competitors = config.competitors || 0;
@@ -56,12 +67,16 @@ class Company {
         return Math.round(value * 100) / 100;
     }
 
-    _tc(Q) {
-        return (this.costA * Q * Q + this.costB * Q + this.costC) * this.costMultiplier;
+    _getTaxCostFactor(taxRate = 0) {
+        return 1 + (taxRate * this.taxMultiplier) / 100;
     }
 
-    _mc(Q) {
-        return 2 * this.costA * Q + this.costB;
+    _tc(Q, taxRate = 0) {
+        return (this.costA * Q * Q + this.costB * Q + this.costC) * this.costMultiplier * this._getTaxCostFactor(taxRate);
+    }
+
+    _mc(Q, taxRate = 0) {
+        return (2 * this.costA * Q + this.costB) * this.costMultiplier * this._getTaxCostFactor(taxRate);
     }
 
     _price(Q) {
@@ -88,11 +103,40 @@ class Company {
         };
     }
 
+    _applyShutdownRule(result, taxRate = 0) {
+        if (result.profit < 0) {
+            const shutdownPrice = this._round(this.demandA * this.demandMultiplier);
+            return this._normalizeOutcome({
+                ...result,
+                Q: 0,
+                P: shutdownPrice,
+                tc: 0,
+                rev: 0,
+                profit: 0,
+                MC: this._mc(0, taxRate),
+                Q2: result.Q2,
+                Qtotal: result.Q2 !== undefined ? this._round(result.Q2) : 0
+            });
+        }
+
+        return this._normalizeOutcome(result);
+    }
+
+    _matchesStudentValue(studentValue, actualValue, baseTolerance = 1) {
+        const roundedActual = Math.round(actualValue);
+        return Math.abs(studentValue - actualValue) <= baseTolerance
+            || Math.abs(studentValue - roundedActual) <= baseTolerance;
+    }
+
     randomizeCosts() {
-        const factor = () => 0.85 + Math.random() * 0.3;
-        this.costA = this._round(this.originalCostA * factor());
-        this.costB = this._round(this.originalCostB * factor());
-        this.costC = this._round(this.originalCostC * factor());
+        const vary = (value, minValue = 0) => {
+            const delta = Math.floor(Math.random() * 3) - 1;
+            return Math.max(minValue, Math.round(value + delta));
+        };
+        this.baseCostA = vary(this.originalCostA, 0);
+        this.baseCostB = vary(this.originalCostB, 1);
+        this.baseCostC = vary(this.originalCostC, 0);
+        this.recalculateShockEffects();
         this._recalculate();
     }
 
@@ -121,38 +165,42 @@ class Company {
         return `TC = ${this.competitorCostB}Q`;
     }
 
-    _solvePerfectCompetition() {
+    _solvePerfectCompetition(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const denominator = b + 2 * this.costA;
-        const Q = denominator > 0 ? Math.max(0, (a - this.costB) / denominator) : 0;
+        const taxFactor = this._getTaxCostFactor(taxRate);
+        const denominator = b + 2 * this.costA * this.costMultiplier * taxFactor;
+        const numerator = a - this.costB * this.costMultiplier * taxFactor;
+        const Q = denominator > 0 ? Math.max(0, numerator / denominator) : 0;
         const P = this._price(Q);
-        const tc = this._tc(Q);
+        const tc = this._tc(Q, taxRate);
         const rev = P * Q;
 
-        return this._normalizeOutcome({
+        return this._applyShutdownRule({
             Q,
             P,
             tc,
             rev,
-            profit: 0,
-            MC: this._mc(Q),
-            condition: `P = MC: ${a} - ${b}Q = ${this.costA !== 0 ? `${2 * this.costA}Q + ${this.costB}` : this.costB}`
-        });
+            profit: rev - tc,
+            MC: this._mc(Q, taxRate),
+            condition: `P = MC`
+        }, taxRate);
     }
 
-    _solveMonopoly() {
+    _solveMonopoly(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const denominator = 2 * b + 2 * this.costA;
-        const Q = denominator > 0 ? Math.max(0, (a - this.costB) / denominator) : 0;
+        const taxFactor = this._getTaxCostFactor(taxRate);
+        const denominator = 2 * b + 2 * this.costA * this.costMultiplier * taxFactor;
+        const numerator = a - this.costB * this.costMultiplier * taxFactor;
+        const Q = denominator > 0 ? Math.max(0, numerator / denominator) : 0;
         const P = this._price(Q);
         const MR = a - 2 * b * Q;
-        const MC = this._mc(Q);
-        const tc = this._tc(Q);
+        const MC = this._mc(Q, taxRate);
+        const tc = this._tc(Q, taxRate);
         const rev = P * Q;
 
-        return this._normalizeOutcome({
+        return this._applyShutdownRule({
             Q,
             P,
             tc,
@@ -160,26 +208,27 @@ class Company {
             profit: rev - tc,
             MR,
             MC,
-            condition: `MR = MC: ${a} - ${2 * b}Q = ${this.costA !== 0 ? `${2 * this.costA}Q + ${this.costB}` : this.costB}`
-        });
+            condition: `MR = MC`
+        }, taxRate);
     }
 
-    _solveCournot() {
+    _solveCournot(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const d1 = this._reactionDenominator(this.costA);
-        const d2 = this._reactionDenominator(this.competitorCostA);
+        const taxFactor = this._getTaxCostFactor(taxRate);
+        const d1 = 2 * b + 2 * this.costA * this.costMultiplier * taxFactor;
+        const d2 = 2 * b + 2 * this.competitorCostA * taxFactor;
 
-        const numeratorQ1 = d2 * (a - this.costB) - b * (a - this.competitorCostB);
+        const numeratorQ1 = d2 * (a - this.costB * this.costMultiplier * taxFactor) - b * (a - this.competitorCostB * taxFactor);
         const denominatorQ1 = d1 * d2 - b * b;
         const Q1 = denominatorQ1 !== 0 ? Math.max(0, numeratorQ1 / denominatorQ1) : 0;
-        const Q2 = d2 !== 0 ? Math.max(0, (a - this.competitorCostB - b * Q1) / d2) : 0;
+        const Q2 = d2 !== 0 ? Math.max(0, (a - this.competitorCostB * taxFactor - b * Q1) / d2) : 0;
         const Qtotal = Q1 + Q2;
         const P = Math.max(0, a - b * Qtotal);
-        const tc = this._tc(Q1);
+        const tc = this._tc(Q1, taxRate);
         const rev = P * Q1;
 
-        return this._normalizeOutcome({
+        return this._applyShutdownRule({
             Q: Q1,
             Q2,
             P,
@@ -187,18 +236,19 @@ class Company {
             tc,
             rev,
             profit: rev - tc,
-            reaction1: `Q₁ = (${a} - ${this.costB} - ${b}Q₂) / ${d1}`,
-            reaction2: `Q₂ = (${a} - ${this.competitorCostB} - ${b}Q₁) / ${d2}`
-        });
+            reaction1: `Q₁ = (${this._round(a)} - ${this._round(this.costB * this.costMultiplier * taxFactor)} - ${b}Q₂) / ${this._round(d1)}`,
+            reaction2: `Q₂ = (${this._round(a)} - ${this._round(this.competitorCostB * taxFactor)} - ${b}Q₁) / ${this._round(d2)}`
+        }, taxRate);
     }
 
-    _solveStackelbergLeader() {
+    _solveStackelbergLeader(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const followerDenominator = this._reactionDenominator(this.competitorCostA);
+        const taxFactor = this._getTaxCostFactor(taxRate);
+        const followerDenominator = 2 * b + 2 * this.competitorCostA * taxFactor;
         const followerReaction = (Q1) => {
             if (followerDenominator <= 0) return 0;
-            return Math.max(0, (a - this.competitorCostB - b * Q1) / followerDenominator);
+            return Math.max(0, (a - this.competitorCostB * taxFactor - b * Q1) / followerDenominator);
         };
 
         const maxQ = Math.max(1, Math.ceil(a / Math.max(b, 1)));
@@ -209,7 +259,7 @@ class Company {
             const Q2 = followerReaction(Q1);
             const Qtotal = Q1 + Q2;
             const P = Math.max(0, a - b * Qtotal);
-            const tc = this._tc(Q1);
+            const tc = this._tc(Q1, taxRate);
             const rev = P * Q1;
             const profit = rev - tc;
 
@@ -218,7 +268,7 @@ class Company {
             }
         }
 
-        return this._normalizeOutcome({
+        return this._applyShutdownRule({
             Q: best.Q1,
             Q2: best.Q2,
             P: best.P,
@@ -226,22 +276,22 @@ class Company {
             tc: best.tc,
             rev: best.rev,
             profit: best.profit,
-            reactionFollower: `Q₂ = max(0, (${a} - ${this.competitorCostB} - ${b}Q₁) / ${followerDenominator})`
-        });
+            reactionFollower: `Q₂ = max(0, (${this._round(a)} - ${this._round(this.competitorCostB * taxFactor)} - ${b}Q₁) / ${this._round(followerDenominator)})`
+        }, taxRate);
     }
 
-    getTheoreticalOutcome() {
+    getTheoreticalOutcome(taxRate = 0) {
         switch (this.marketStructure) {
             case "monopoly":
-                return { ...this._solveMonopoly(), marketStructure: this.marketStructure };
+                return { ...this._solveMonopoly(taxRate), marketStructure: this.marketStructure };
             case "cournot":
-                return { ...this._solveCournot(), marketStructure: this.marketStructure };
+                return { ...this._solveCournot(taxRate), marketStructure: this.marketStructure };
             case "stackelberg_leader":
             case "stackelberg_follower":
-                return { ...this._solveStackelbergLeader(), marketStructure: this.marketStructure };
+                return { ...this._solveStackelbergLeader(taxRate), marketStructure: this.marketStructure };
             case "perfect_competition":
             default:
-                return { ...this._solvePerfectCompetition(), marketStructure: this.marketStructure };
+                return { ...this._solvePerfectCompetition(taxRate), marketStructure: this.marketStructure };
         }
     }
 
@@ -258,10 +308,15 @@ class Company {
     }
 
     calculateProfit(taxRate = 20) {
-        this._recalculate();
-        const effectiveTax = (taxRate * this.taxMultiplier) / 100;
-        const baseProfit = this.marketStructure === "perfect_competition" ? 0 : this.profit;
-        this.profit = this._round(baseProfit * (1 - effectiveTax));
+        const result = this.getTheoreticalOutcome(taxRate);
+        this.production = result.Q;
+        this.productPrice = result.P;
+        this.competitorProduction = result.Q2 || 0;
+        this.totalCost = result.tc;
+        this.revenue = result.rev;
+        this.profit = result.profit;
+        this.demand = result.Q;
+        this._lastResult = result;
         return this.profit;
     }
 
@@ -294,17 +349,8 @@ class Company {
     }
 
     applyShock(shock) {
-        const companyEffects = shock.effects?.[this.config.id];
-        const allEffects = shock.effects?.all;
-        const effects = [allEffects, companyEffects].filter(Boolean);
-
-        effects.forEach((effect) => {
-            if (effect.demand) this.demandMultiplier *= effect.demand;
-            if (effect.cost) this.costMultiplier *= effect.cost;
-            if (effect.tax) this.taxMultiplier *= effect.tax;
-        });
-
         this.activeShocks.push({ shock, roundsRemaining: shock.duration || 1 });
+        this.recalculateShockEffects();
         this._recalculate();
     }
 
@@ -313,14 +359,44 @@ class Company {
             item.roundsRemaining -= 1;
             return item.roundsRemaining > 0;
         });
-
-        if (this.activeShocks.length === 0) {
-            this.demandMultiplier = 1;
-            this.costMultiplier = 1;
-            this.taxMultiplier = 1;
-        }
-
+        this.recalculateShockEffects();
         this._recalculate();
+    }
+
+    recalculateShockEffects() {
+        this.demandMultiplier = 1;
+        this.costMultiplier = 1;
+        this.taxMultiplier = 1;
+
+        this.demandA = this.baseDemandA;
+        this.demandB = this.baseDemandB;
+        this.costA = this.baseCostA;
+        this.costB = this.baseCostB;
+        this.costC = this.baseCostC;
+        this.competitorCostA = this.baseCompetitorCostA;
+        this.competitorCostB = this.baseCompetitorCostB;
+        this.competitorCostC = this.baseCompetitorCostC;
+
+        this.activeShocks.forEach(({ shock }) => {
+            const appliesToCompany = shock.target === "all" || shock.target === this.config.id;
+            if (appliesToCompany && shock.changes) {
+                Object.entries(shock.changes).forEach(([key, multiplier]) => {
+                    if (typeof this[key] === "number") {
+                        this[key] = this._round(this[key] * multiplier);
+                    }
+                });
+            }
+
+            const companyEffects = shock.effects?.[this.config.id];
+            const allEffects = shock.effects?.all;
+            const effects = [allEffects, companyEffects].filter(Boolean);
+
+            effects.forEach((effect) => {
+                if (effect.demand) this.demandMultiplier *= effect.demand;
+                if (effect.cost) this.costMultiplier *= effect.cost;
+                if (effect.tax) this.taxMultiplier *= effect.tax;
+            });
+        });
     }
 
     getMarketStructureName() {
@@ -379,13 +455,12 @@ class Company {
         }
 
         const expected = this.getTheoreticalOutcome();
-        const tolerance = 0.25;
         const result = {
             isComplete: true,
             expected,
-            priceCorrect: Math.abs(price - expected.P) <= tolerance,
-            quantityCorrect: Math.abs(quantity - expected.Q) <= tolerance,
-            profitCorrect: Math.abs(profit - expected.profit) <= tolerance
+            priceCorrect: this._matchesStudentValue(price, expected.P, 1),
+            quantityCorrect: this._matchesStudentValue(quantity, expected.Q, 1),
+            profitCorrect: this._matchesStudentValue(profit, expected.profit, 2)
         };
 
         result.isCorrect = result.priceCorrect && result.quantityCorrect && result.profitCorrect;
@@ -409,22 +484,19 @@ class Company {
             };
         }
 
-        const expected = this.getTheoreticalOutcome();
-        const effectiveTax = (taxRate * this.taxMultiplier) / 100;
-        const actualProfitBeforeTax = expected.profit;
-        const actualProfit = this._round(actualProfitBeforeTax * (1 - effectiveTax));
-        const tolerance = 0.25;
+        const expected = this.getTheoreticalOutcome(taxRate);
+        const actualProfit = expected.profit;
         const isCorrect =
-            Math.abs(submission.price - expected.P) <= tolerance &&
-            Math.abs(submission.quantity - expected.Q) <= tolerance &&
-            Math.abs(submission.expectedProfit - actualProfit) <= tolerance;
+            this._matchesStudentValue(submission.price, expected.P, 1) &&
+            this._matchesStudentValue(submission.quantity, expected.Q, 1) &&
+            this._matchesStudentValue(submission.expectedProfit, actualProfit, 2);
 
         this.production = expected.Q;
         this.productPrice = expected.P;
         this.competitorProduction = expected.Q2 || 0;
         this.totalCost = expected.tc;
         this.revenue = expected.rev;
-        this.profit = this.marketStructure === "perfect_competition" ? 0 : actualProfit;
+        this.profit = actualProfit;
         this.demand = expected.Q;
 
         const report = {
