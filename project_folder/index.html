@@ -3,168 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Экономический симулятор</title>
+    <title>ВШЭ Экономический симулятор</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <!-- Шапка игры -->
-        <header class="game-header">
-            <div class="player-stats">
-                <h1>Экономический симулятор</h1>
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <span class="stat-label">Капитал:</span>
-                        <span id="playerCapital" class="stat-value">1,000,000 ₽</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Раунд:</span>
-                        <span id="currentRound" class="stat-value">1</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Чистая стоимость:</span>
-                        <span id="netWorth" class="stat-value">1,000,000 ₽</span>
-                    </div>
+<div class="game-container">
+
+    <!-- ШАпка -->
+    <header class="game-header">
+        <div class="player-stats">
+            <h1>📊 ВШЭ Симулятор</h1>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span class="stat-label">Капитал</span>
+                    <span id="playerCapital" class="stat-value">1 000 000 ₽</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Раунд</span>
+                    <span id="currentRound" class="stat-value">1</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Чистая стоимость</span>
+                    <span id="netWorth" class="stat-value">1 000 000 ₽</span>
                 </div>
             </div>
-            
-            <div class="economy-stats">
-                <div class="economy-item">
-                    <span>📈 Инфляция:</span>
-                    <span id="inflationRate">5.0%</span>
-                </div>
-                <div class="economy-item">
-                    <span>🏦 Ставка ЦБ:</span>
-                    <span id="interestRate">7.5%</span>
-                </div>
-                <div class="economy-item">
-                    <span>💰 Налоги:</span>
-                    <span id="taxRate">20%</span>
-                </div>
+        </div>
+        <div class="economy-stats">
+            <div class="economy-item">
+                <span class="econ-label">📈 Инфляция</span>
+                <span id="inflationRate" class="econ-val">5.0%</span>
             </div>
-        </header>
+            <div class="economy-item">
+                <span class="econ-label">🏦 Ставка ЦБ</span>
+                <span id="interestRate" class="econ-val">7.5%</span>
+            </div>
+            <div class="economy-item">
+                <span class="econ-label">💰 Налог</span>
+                <span id="taxRate" class="econ-val">20%</span>
+            </div>
+        </div>
+    </header>
 
-        <!-- Основная игровая область -->
-        <main class="game-main">
-            <!-- Левая панель - Бизнесы -->
-            <section class="panel businesses-panel">
-                <div class="panel-header">
-                    <h2>🏢 Ваши компании</h2>
-                    <button id="btnBuyCompany" class="btn btn-primary">
-                        + Купить компанию
-                    </button>
-                </div>
-                <div id="companiesList" class="companies-list">
-                    <!-- Список компаний будет генерироваться здесь -->
-                </div>
-            </section>
+    <!-- Основная область -->
+    <main class="game-main">
 
-            <!-- Центральная панель - Управление -->
-            <section class="panel control-panel">
-                <div class="panel-header">
-                    <h2>⚙️ Управление бизнесом</h2>
-                </div>
-                
-                <div id="businessControls" class="business-controls" style="display: none;">
-                    <h3 id="selectedCompanyName">Название компании</h3>
-                    
+        <!-- ЛЕВАЯ: Список компаний -->
+        <section class="panel businesses-panel">
+            <div class="panel-header">
+                <h2>🏢 Компании</h2>
+                <button id="btnBuyCompany" class="btn btn-primary btn-small">+ Купить</button>
+            </div>
+            <div id="companiesList" class="companies-list"></div>
+        </section>
+
+        <!-- ЦЕНТРАЛЬНАЯ: Управление + График -->
+        <section class="panel control-panel">
+            <div class="panel-header">
+                <h2>⚙️ Управление</h2>
+            </div>
+
+            <div id="businessControls" class="business-controls" style="display:none;">
+                <h3 id="selectedCompanyName" class="selected-name">Компания</h3>
+
+                <div class="controls-row">
                     <div class="control-group">
-                        <label for="priceInput">Цена товара/услуги (₽):</label>
+                        <label>Цена P* (авто):</label>
                         <div class="input-with-button">
-                            <input type="number" id="priceInput" min="1" value="100">
-                            <button id="btnApplyPrice" class="btn btn-small">Применить</button>
+                            <input type="number" id="priceInput" disabled title="Рассчитывается автоматически">
+                            <span class="input-badge">авто</span>
                         </div>
                     </div>
-                    
                     <div class="control-group">
-                        <label for="productionInput">Объем производства (ед.):</label>
+                        <label>Объём производства Q:</label>
                         <div class="input-with-button">
-                            <input type="number" id="productionInput" min="0" value="1000">
-                            <button id="btnApplyProduction" class="btn btn-small">Применить</button>
+                            <input type="number" id="productionInput" min="0" value="0">
+                            <button id="btnApplyProduction" class="btn btn-small">✓</button>
                         </div>
                     </div>
-                    
-                    <div class="control-buttons">
-                        <button id="btnSellCompany" class="btn btn-danger">
-                            🗑️ Продать компанию
-                        </button>
-                        <button id="btnCompanyDetails" class="btn btn-info">
-                            📊 Детали компании
-                        </button>
-                    </div>
-                    
-                    <!-- Панель деталей компании -->
-                    <div id="companyDetails" class="company-details-panel" style="display: none; margin-top: 20px;">
-                        <!-- Детали компании будут отображаться здесь -->
-                    </div>
                 </div>
-                
-                <div id="noCompanySelected" class="no-company-message" style="text-align: center; padding: 40px; color: #7f8c8d;">
-                    <h3>Выберите компанию для управления</h3>
-                    <p>Нажмите на компанию в левой панели, чтобы начать управление</p>
-                </div>
-            </section>
 
-            <!-- Правая панель - Аналитика -->
-            <section class="panel analytics-panel">
-                <div class="panel-header">
-                    <h2>📈 Быстрая аналитика</h2>
+                <div class="control-buttons">
+                    <button id="btnSellCompany"    class="btn btn-danger btn-small">🗑 Продать</button>
+                    <button id="btnCompanyDetails" class="btn btn-info btn-small">📊 Детали</button>
                 </div>
-                <div id="quickAnalytics" class="quick-analytics">
-                    <!-- Быстрая аналитика будет здесь -->
-                    <div class="analytics-placeholder">
-                        <p>После первого раунда здесь появится аналитика</p>
-                    </div>
-                </div>
-            </section>
-        </main>
 
-        <!-- Нижняя панель управления -->
-        <footer class="game-footer">
-            <div class="footer-left">
-                <button id="btnSaveGame" class="btn btn-secondary">
-                    💾 Сохранить игру
-                </button>
-                <button id="btnLoadGame" class="btn btn-secondary">
-                    📂 Загрузить игру
-                </button>
+                <!-- График -->
+                <div class="chart-container">
+                    <canvas id="companyChart"></canvas>
+                </div>
+
+                <!-- Детали + проверка -->
+                <div id="companyDetails" class="company-details-panel" style="display:none;"></div>
             </div>
-            
-            <div class="footer-center">
-                <div class="round-status">
-                    <span id="roundStatus">Готов к началу игры</span>
+
+            <div id="noCompanySelected" class="no-company-message">
+                <div class="no-company-icon">🏗️</div>
+                <h3>Выберите компанию</h3>
+                <p>Нажмите на карточку компании слева, чтобы управлять ею и видеть графики</p>
+            </div>
+        </section>
+
+        <!-- ПРАВАЯ: Аналитика + Рынок -->
+        <section class="panel analytics-panel">
+            <div class="panel-header">
+                <h2>📈 Аналитика</h2>
+            </div>
+            <div id="quickAnalytics" class="quick-analytics">
+                <div class="analytics-placeholder">
+                    <p>Нажмите «Следующий раунд» для начала</p>
                 </div>
             </div>
-            
-            <div class="footer-right">
-                <button id="btnNextRound" class="btn btn-primary btn-large">
-                    ⏭️ Следующий раунд
-                </button>
-            </div>
-        </footer>
-    </div>
 
-    <!-- Подключаем JavaScript файлы БЕЗ type="module" -->
-   <!-- Утилиты -->
+            <!-- Золотовалютный рынок -->
+            <div class="panel-section" style="margin-top:20px;">
+                <h3 class="section-title">🪙 Золотовалютный рынок</h3>
+
+                <!-- Золото -->
+                <div class="metal-card">
+                    <div class="metal-header">
+                        <span>🥇 Золото</span>
+                        <span id="goldPrice" class="metal-price">5 000 ₽/ед.</span>
+                    </div>
+                    <div id="goldQty" class="metal-qty">В портфеле: 0 ед.</div>
+                    <div class="metal-controls">
+                        <input type="number" id="goldBuyQty"  min="1" value="1" class="metal-input">
+                        <button id="btnBuyGold"  class="btn btn-success btn-small">Купить</button>
+                        <input type="number" id="goldSellQty" min="1" value="1" class="metal-input">
+                        <button id="btnSellGold" class="btn btn-warning btn-small">Продать</button>
+                    </div>
+                </div>
+
+                <!-- Платина -->
+                <div class="metal-card" style="margin-top:12px;">
+                    <div class="metal-header">
+                        <span>🥈 Платина</span>
+                        <span id="platinumPrice" class="metal-price">3 000 ₽/ед.</span>
+                    </div>
+                    <div id="platinumQty" class="metal-qty">В портфеле: 0 ед.</div>
+                    <div class="metal-controls">
+                        <input type="number" id="platinumBuyQty"  min="1" value="1" class="metal-input">
+                        <button id="btnBuyPlatinum"  class="btn btn-success btn-small">Купить</button>
+                        <input type="number" id="platinumSellQty" min="1" value="1" class="metal-input">
+                        <button id="btnSellPlatinum" class="btn btn-warning btn-small">Продать</button>
+                    </div>
+                </div>
+
+                <!-- Инсайд -->
+                <div class="metal-card" style="margin-top:12px;">
+                    <div class="metal-header">
+                        <span>🔍 Инсайд (50 000 ₽)</span>
+                        <button id="btnInsiderInfo" class="btn btn-small" style="background:#8e44ad;color:white;">Купить</button>
+                    </div>
+                    <div id="insiderInfoDisplay" class="insider-inactive">ℹ️ Нет активной информации</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Футер -->
+    <footer class="game-footer">
+        <div class="footer-left">
+            <button id="btnSaveGame" class="btn btn-secondary btn-small">💾 Сохранить</button>
+            <button id="btnLoadGame" class="btn btn-secondary btn-small">📂 Загрузить</button>
+        </div>
+        <div class="footer-center">
+            <span id="roundStatus" class="round-status">Готов к игре</span>
+        </div>
+        <div class="footer-right">
+            <button id="btnNextRound" class="btn btn-primary btn-large">⏭️ Следующий раунд</button>
+        </div>
+    </footer>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<!-- Утилиты -->
 <script src="js/utils/helpers.js"></script>
-
-<!-- Конфигурации  -->
+<!-- Конфиги -->
 <script src="js/config/businessConfig.js"></script>
-<script src="js/config/constants.js"></script>  <!-- ДОЛЖЕН БЫТЬ ПЕРЕД StockMarket.js -->
-
+<script src="js/config/constants.js"></script>
 <!-- Модели -->
 <script src="js/models/Player.js"></script>
 <script src="js/models/Company.js"></script>
 <script src="js/models/EconomicEnvironment.js"></script>
 <script src="js/models/StockMarket.js"></script>
 <script src="js/models/Bank.js"></script>
-
 <!-- Игровая логика -->
 <script src="js/game/GameEngine.js"></script>
-
 <!-- UI -->
 <script src="js/ui/UIManager.js"></script>
-
 <!-- Точка входа -->
 <script src="main.js"></script>
 </body>
