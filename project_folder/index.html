@@ -40,7 +40,7 @@
             </div>
             <div class="economy-item">
                 <span class="econ-label">💰 Налог</span>
-                <span id="taxRate" class="econ-val">20%</span>
+                <span id="taxRate" class="econ-val">2 ден. ед. / ед.</span>
             </div>
         </div>
     </header>
@@ -100,6 +100,22 @@
             </div>
 
             <div class="panel-section" style="margin-top:20px;">
+                <h3 class="section-title">🏦 Банк</h3>
+                <div class="metal-card">
+                    <div class="metal-header">
+                        <span>Кредит на 4 раунда</span>
+                        <span id="bankLoanRate" class="metal-price">Ставка: 0%</span>
+                    </div>
+                    <div id="bankLoanInfo" class="metal-qty">К возврату через 4 раунда по ставке ЦБ + 1 п.п.</div>
+                    <div class="metal-controls">
+                        <input type="number" id="loanAmountInput" min="10000" step="10000" value="100000" class="metal-input">
+                        <button id="btnTakeLoan" class="btn btn-primary btn-small">Взять займ</button>
+                    </div>
+                    <div id="bankLoansList" class="insider-inactive" style="margin-top:10px;">Активных займов нет</div>
+                </div>
+            </div>
+
+            <div class="panel-section" style="margin-top:20px;">
                 <h3 class="section-title">🪙 Золотовалютный рынок</h3>
 
                 <div class="metal-card">
@@ -118,15 +134,15 @@
 
                 <div class="metal-card" style="margin-top:12px;">
                     <div class="metal-header">
-                        <span>🥈 Платина</span>
-                        <span id="platinumPrice" class="metal-price">3 000 ₽/ед.</span>
+                        <span>🥈 Серебро</span>
+                        <span id="silverPrice" class="metal-price">1 200 ₽/ед.</span>
                     </div>
-                    <div id="platinumQty" class="metal-qty">В портфеле: 0 ед.</div>
+                    <div id="silverQty" class="metal-qty">В портфеле: 0 ед.</div>
                     <div class="metal-controls">
-                        <input type="number" id="platinumBuyQty" min="1" value="1" class="metal-input">
-                        <button id="btnBuyPlatinum" class="btn btn-success btn-small">Купить</button>
-                        <input type="number" id="platinumSellQty" min="1" value="1" class="metal-input">
-                        <button id="btnSellPlatinum" class="btn btn-warning btn-small">Продать</button>
+                        <input type="number" id="silverBuyQty" min="1" value="1" class="metal-input">
+                        <button id="btnBuySilver" class="btn btn-success btn-small">Купить</button>
+                        <input type="number" id="silverSellQty" min="1" value="1" class="metal-input">
+                        <button id="btnSellSilver" class="btn btn-warning btn-small">Продать</button>
                     </div>
                 </div>
 

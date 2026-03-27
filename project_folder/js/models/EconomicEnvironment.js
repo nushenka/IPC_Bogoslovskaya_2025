@@ -3,12 +3,12 @@ class EconomicEnvironment {
     constructor() {
         this.baseInflation = 5;
         this.baseInterestRate = 8;
-        this.baseTaxRate = 20;
+        this.baseTaxRate = 2;
         this.baseGlobalDemand = 85;
 
         this.inflation = this.baseInflation;
         this.interestRate = this.baseInterestRate;
-        this.taxRate = 20;
+        this.taxRate = this.baseTaxRate;
         this.globalDemand = this.baseGlobalDemand;
         this.activeShocks = [];
     }
@@ -54,7 +54,7 @@ class EconomicEnvironment {
 
         this.inflation = Math.max(0, Math.min(25, this.baseInflation + inflationDelta));
         this.interestRate = Math.max(4, Math.min(25, this.baseInterestRate + interestRateDelta));
-        this.taxRate = Math.max(10, Math.min(35, this.baseTaxRate + taxRateDelta));
+        this.taxRate = Math.max(0, Math.min(8, this.baseTaxRate + taxRateDelta));
         this.globalDemand = Math.max(20, Math.min(140, this.baseGlobalDemand + globalDemandDelta));
     }
     

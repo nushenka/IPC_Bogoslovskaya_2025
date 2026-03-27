@@ -67,16 +67,17 @@ class Company {
         return Math.round(value * 100) / 100;
     }
 
-    _getTaxCostFactor(taxRate = 0) {
-        return 1 + (taxRate * this.taxMultiplier) / 100;
+    _getUnitTax(taxRate = 0) {
+        return taxRate * this.taxMultiplier;
     }
 
     _tc(Q, taxRate = 0) {
-        return (this.costA * Q * Q + this.costB * Q + this.costC) * this.costMultiplier * this._getTaxCostFactor(taxRate);
+        const baseCost = (this.costA * Q * Q + this.costB * Q + this.costC) * this.costMultiplier;
+        return baseCost + this._getUnitTax(taxRate) * Q;
     }
 
     _mc(Q, taxRate = 0) {
-        return (2 * this.costA * Q + this.costB) * this.costMultiplier * this._getTaxCostFactor(taxRate);
+        return (2 * this.costA * Q + this.costB) * this.costMultiplier + this._getUnitTax(taxRate);
     }
 
     _price(Q) {
@@ -129,6 +130,12 @@ class Company {
     }
 
     randomizeCosts() {
+        if (this.marketStructure === "perfect_competition") {
+            this.recalculateShockEffects();
+            this._recalculate();
+            return;
+        }
+
         const vary = (value, minValue = 0) => {
             const delta = Math.floor(Math.random() * 3) - 1;
             return Math.max(minValue, Math.round(value + delta));
@@ -168,9 +175,9 @@ class Company {
     _solvePerfectCompetition(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const taxFactor = this._getTaxCostFactor(taxRate);
-        const denominator = b + 2 * this.costA * this.costMultiplier * taxFactor;
-        const numerator = a - this.costB * this.costMultiplier * taxFactor;
+        const unitTax = this._getUnitTax(taxRate);
+        const denominator = b + 2 * this.costA * this.costMultiplier;
+        const numerator = a - this.costB * this.costMultiplier - unitTax;
         const Q = denominator > 0 ? Math.max(0, numerator / denominator) : 0;
         const P = this._price(Q);
         const tc = this._tc(Q, taxRate);
@@ -190,9 +197,9 @@ class Company {
     _solveMonopoly(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const taxFactor = this._getTaxCostFactor(taxRate);
-        const denominator = 2 * b + 2 * this.costA * this.costMultiplier * taxFactor;
-        const numerator = a - this.costB * this.costMultiplier * taxFactor;
+        const unitTax = this._getUnitTax(taxRate);
+        const denominator = 2 * b + 2 * this.costA * this.costMultiplier;
+        const numerator = a - this.costB * this.costMultiplier - unitTax;
         const Q = denominator > 0 ? Math.max(0, numerator / denominator) : 0;
         const P = this._price(Q);
         const MR = a - 2 * b * Q;
@@ -215,14 +222,14 @@ class Company {
     _solveCournot(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const taxFactor = this._getTaxCostFactor(taxRate);
-        const d1 = 2 * b + 2 * this.costA * this.costMultiplier * taxFactor;
-        const d2 = 2 * b + 2 * this.competitorCostA * taxFactor;
+        const unitTax = this._getUnitTax(taxRate);
+        const d1 = 2 * b + 2 * this.costA * this.costMultiplier;
+        const d2 = 2 * b + 2 * this.competitorCostA;
 
-        const numeratorQ1 = d2 * (a - this.costB * this.costMultiplier * taxFactor) - b * (a - this.competitorCostB * taxFactor);
+        const numeratorQ1 = d2 * (a - this.costB * this.costMultiplier - unitTax) - b * (a - this.competitorCostB - unitTax);
         const denominatorQ1 = d1 * d2 - b * b;
         const Q1 = denominatorQ1 !== 0 ? Math.max(0, numeratorQ1 / denominatorQ1) : 0;
-        const Q2 = d2 !== 0 ? Math.max(0, (a - this.competitorCostB * taxFactor - b * Q1) / d2) : 0;
+        const Q2 = d2 !== 0 ? Math.max(0, (a - this.competitorCostB - unitTax - b * Q1) / d2) : 0;
         const Qtotal = Q1 + Q2;
         const P = Math.max(0, a - b * Qtotal);
         const tc = this._tc(Q1, taxRate);
@@ -236,19 +243,19 @@ class Company {
             tc,
             rev,
             profit: rev - tc,
-            reaction1: `Q₁ = (${this._round(a)} - ${this._round(this.costB * this.costMultiplier * taxFactor)} - ${b}Q₂) / ${this._round(d1)}`,
-            reaction2: `Q₂ = (${this._round(a)} - ${this._round(this.competitorCostB * taxFactor)} - ${b}Q₁) / ${this._round(d2)}`
+            reaction1: `Q₁ = (${this._round(a)} - ${this._round(this.costB * this.costMultiplier + unitTax)} - ${b}Q₂) / ${this._round(d1)}`,
+            reaction2: `Q₂ = (${this._round(a)} - ${this._round(this.competitorCostB + unitTax)} - ${b}Q₁) / ${this._round(d2)}`
         }, taxRate);
     }
 
     _solveStackelbergLeader(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
-        const taxFactor = this._getTaxCostFactor(taxRate);
-        const followerDenominator = 2 * b + 2 * this.competitorCostA * taxFactor;
+        const unitTax = this._getUnitTax(taxRate);
+        const followerDenominator = 2 * b + 2 * this.competitorCostA;
         const followerReaction = (Q1) => {
             if (followerDenominator <= 0) return 0;
-            return Math.max(0, (a - this.competitorCostB * taxFactor - b * Q1) / followerDenominator);
+            return Math.max(0, (a - this.competitorCostB - unitTax - b * Q1) / followerDenominator);
         };
 
         const maxQ = Math.max(1, Math.ceil(a / Math.max(b, 1)));
@@ -276,7 +283,7 @@ class Company {
             tc: best.tc,
             rev: best.rev,
             profit: best.profit,
-            reactionFollower: `Q₂ = max(0, (${this._round(a)} - ${this._round(this.competitorCostB * taxFactor)} - ${b}Q₁) / ${this._round(followerDenominator)})`
+            reactionFollower: `Q₂ = max(0, (${this._round(a)} - ${this._round(this.competitorCostB + unitTax)} - ${b}Q₁) / ${this._round(followerDenominator)})`
         }, taxRate);
     }
 

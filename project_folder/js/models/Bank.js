@@ -2,114 +2,85 @@
 class Bank {
     constructor() {
         this.loans = [];
-        this.interestRate = 7.5; // Базовая ставка
+        this.interestRate = 9;
+        this.loanMarkup = 1;
         this.maxLoanAmount = 5000000;
+        this.defaultDuration = 4;
         this.currentRound = 1;
     }
     
-    // Взять кредит
-    takeLoan(player, amount, duration) {
+    takeLoan(player, amount, centralBankRate) {
+        if (amount <= 0) {
+            return { success: false, message: "Введите корректную сумму кредита" };
+        }
+
         if (amount > this.maxLoanAmount) {
             return { success: false, message: 'Сумма превышает максимальный лимит' };
         }
-        
-        if (player.capital < amount * 0.1) {
-            return { success: false, message: 'Недостаточно средств для залога' };
-        }
-        
+
+        const interestRate = Math.round((centralBankRate + this.loanMarkup) * 100) / 100;
+        const duration = this.defaultDuration;
+        const totalDue = this.calculateTotalDue(amount, interestRate);
+
         const loan = {
             id: 'loan_' + Date.now(),
             amount: amount,
             duration: duration,
-            interestRate: this.interestRate,
+            interestRate,
             startRound: this.currentRound,
-            paymentsMade: 0,
-            totalPayments: duration,
-            monthlyPayment: this.calculateMonthlyPayment(amount, duration),
-            remainingBalance: amount
+            dueRound: this.currentRound + duration,
+            totalDue,
+            remainingBalance: totalDue
         };
-        
+
         this.loans.push(loan);
         player.capital += amount;
-        
+
         return {
             success: true,
             loan: loan,
-            message: `Кредит одобрен на сумму ${amount.toLocaleString()}₽`
+            message: `Кредит одобрен: ${amount.toLocaleString()}₽, к возврату через 4 раунда ${Math.round(totalDue).toLocaleString()}₽`
         };
     }
-    
-    // Рассчитать ежемесячный платеж
-    calculateMonthlyPayment(amount, duration) {
-        const monthlyRate = this.interestRate / 100 / 12;
-        return amount * monthlyRate * Math.pow(1 + monthlyRate, duration) / 
-               (Math.pow(1 + monthlyRate, duration) - 1);
+
+    calculateTotalDue(amount, interestRate) {
+        return Math.round(amount * (1 + interestRate / 100));
     }
-    
-    // Выплатить кредит
-    makePayment(player, loanId) {
-        const loanIndex = this.loans.findIndex(l => l.id === loanId);
-        if (loanIndex === -1) return { success: false, message: 'Кредит не найден' };
-        
-        const loan = this.loans[loanIndex];
-        const paymentAmount = loan.monthlyPayment;
-        
-        if (player.capital >= paymentAmount) {
-            player.capital -= paymentAmount;
-            loan.paymentsMade++;
-            loan.remainingBalance -= paymentAmount;
-            
-            if (loan.paymentsMade >= loan.totalPayments) {
-                this.loans.splice(loanIndex, 1);
-                return { 
-                    success: true, 
-                    message: 'Кредит полностью погашен!',
-                    loanFullyPaid: true 
-                };
-            }
-            
-            return { 
-                success: true, 
-                message: `Платеж ${paymentAmount.toLocaleString()}₽ принят`,
-                paymentsRemaining: loan.totalPayments - loan.paymentsMade
-            };
-        }
-        
-        return { 
-            success: false, 
-            message: 'Недостаточно средств для платежа',
-            requiredAmount: paymentAmount
-        };
-    }
-    
-    // Обновить кредиты (каждый раунд)
-    update() {
+
+    update(player, centralBankRate) {
         this.currentRound++;
-        
-        // Увеличиваем ставку если много кредитов
-        if (this.loans.length > 5) {
-            this.interestRate *= 1.05;
-        }
-        
-        // Снижаем ставку если мало кредитов
-        if (this.loans.length < 2) {
-            this.interestRate *= 0.98;
-        }
-        
-        this.interestRate = Math.max(5, Math.min(20, this.interestRate));
+        this.interestRate = Math.round((centralBankRate + this.loanMarkup) * 100) / 100;
+
+        const reports = [];
+        const activeLoans = [];
+
+        this.loans.forEach((loan) => {
+            if (loan.dueRound <= this.currentRound) {
+                player.capital -= loan.totalDue;
+                loan.remainingBalance = 0;
+                reports.push({
+                    loanId: loan.id,
+                    amount: loan.amount,
+                    totalDue: loan.totalDue,
+                    paid: true
+                });
+            } else {
+                activeLoans.push(loan);
+            }
+        });
+
+        this.loans = activeLoans;
+        return reports;
     }
-    
-    // Получить информацию о кредитах
-    getLoanInfo(playerId) {
-        const playerLoans = this.loans; // В будущем можно фильтровать по игроку
-        
+
+    getLoanInfo() {
         return {
-            interestRate: this.interestRate,
+            interestRate: Math.round(this.interestRate * 100) / 100,
             maxLoanAmount: this.maxLoanAmount,
-            activeLoans: playerLoans.length,
-            totalDebt: playerLoans.reduce((sum, loan) => sum + loan.remainingBalance, 0),
-            monthlyPayment: playerLoans.reduce((sum, loan) => sum + loan.monthlyPayment, 0),
-            loans: playerLoans
+            defaultDuration: this.defaultDuration,
+            activeLoans: this.loans.length,
+            totalDebt: this.loans.reduce((sum, loan) => sum + loan.remainingBalance, 0),
+            loans: this.loans
         };
     }
 }

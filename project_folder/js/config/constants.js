@@ -6,12 +6,12 @@ export const STOCK_MARKET = {
         minPrice: 2500,
         maxPrice: 10000
     },
-    platinum: {
-        name: "Платина",
-        basePrice: 3000,
-        volatility: 0.15,
-        minPrice: 1500,
-        maxPrice: 6000
+    silver: {
+        name: "Серебро",
+        basePrice: 1200,
+        volatility: 0.14,
+        minPrice: 700,
+        maxPrice: 3000
     },
     insiderInfo: {
         basePrice: 50000,
@@ -314,5 +314,90 @@ export const SHOCKS = [
             globalDemandDelta: -8
         },
         duration: 2
+    },
+    {
+        id: "gold_mine_strike",
+        name: "Забастовка на золотых рудниках",
+        target: "market",
+        description: "Добыча золота сокращается, предложение падает, цена металла растет.",
+        marketEffects: {
+            gold: {
+                costA: 1.2,
+                costB: 1.25,
+                demandA: 1.05
+            }
+        },
+        duration: 2
+    },
+    {
+        id: "silver_solar_demand",
+        name: "Рост спроса на серебро в электронике",
+        target: "market",
+        description: "Производители солнечных панелей увеличивают спрос на серебро.",
+        marketEffects: {
+            silver: {
+                demandA: 1.3,
+                demandB: 0.9
+            }
+        },
+        duration: 3
+    },
+    {
+        id: "gold_reserve_sale",
+        name: "Продажа золотых резервов страной",
+        target: "market",
+        description: "На рынок выбрасывается дополнительное золото, цена снижается.",
+        marketEffects: {
+            gold: {
+                demandA: 0.9,
+                costA: 0.95
+            }
+        },
+        duration: 2
+    },
+    {
+        id: "silver_tech_substitution",
+        name: "Технология экономии серебра",
+        target: "market",
+        description: "Новая технология снижает промышленный спрос на серебро.",
+        marketEffects: {
+            silver: {
+                demandA: 0.75,
+                demandB: 1.1
+            }
+        },
+        duration: 3
+    },
+    {
+        id: "mining_geopolitical_conflict",
+        name: "Геополитический конфликт в регионе добычи",
+        target: "market",
+        description: "Риски поставок повышают цены на золото и серебро.",
+        marketEffects: {
+            gold: {
+                costA: 1.15,
+                costB: 1.2
+            },
+            silver: {
+                costA: 1.1,
+                costB: 1.15
+            }
+        },
+        duration: 3
+    },
+    {
+        id: "eco_mining_regulation",
+        name: "Ужесточение экологических норм в добыче",
+        target: "market",
+        description: "Издержки добычи растут из-за новых природоохранных требований.",
+        marketEffects: {
+            gold: {
+                costC: 1.25
+            },
+            silver: {
+                costC: 1.3
+            }
+        },
+        duration: 3
     }
 ];

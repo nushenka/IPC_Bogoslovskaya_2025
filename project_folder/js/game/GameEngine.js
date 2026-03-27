@@ -145,13 +145,8 @@ class GameEngine {
     }
     
     // Взять кредит
-    takeLoan(amount, duration) {
-        return this.bank.takeLoan(this.player, amount, duration);
-    }
-    
-    // Погасить кредит
-    repayLoan(loanId) {
-        return this.bank.makePayment(this.player, loanId);
+    takeLoan(amount) {
+        return this.bank.takeLoan(this.player, amount, this.economy.interestRate);
     }
     
     // Купить металл на бирже
@@ -185,6 +180,7 @@ class GameEngine {
         });
 
         this.economy.applyShock(shock);
+        this.stockMarket.applyShock(shock);
         
         return shock;
     }
@@ -203,7 +199,7 @@ class GameEngine {
         this.economy.update();
         
         // 2. Обновляем банк и биржу
-        this.bank.update();
+        const loanReports = this.bank.update(this.player, this.economy.interestRate);
         this.stockMarket.update();
 
         // 3. Сначала уменьшаем срок жизни уже действующих шоков
@@ -256,6 +252,7 @@ class GameEngine {
             round: this.currentRound - 1,
             totalProfit: totalProfit,
             newShock: newShock,
+            loanReports: loanReports,
             companyProfits: companyProfits,
             decisionReports: decisionReports,
             companies: this.player.companies,

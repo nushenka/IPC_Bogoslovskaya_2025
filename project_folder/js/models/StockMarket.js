@@ -12,21 +12,54 @@ class StockMarket {
                 volatility: STOCK_MARKET.gold.volatility,
                 quantity: 0
             },
-            platinum: {
-                name: STOCK_MARKET.platinum.name,
-                currentPrice: STOCK_MARKET.platinum.basePrice,
-                minPrice: STOCK_MARKET.platinum.minPrice,
-                maxPrice: STOCK_MARKET.platinum.maxPrice,
-                volatility: STOCK_MARKET.platinum.volatility,
+            silver: {
+                name: STOCK_MARKET.silver.name,
+                currentPrice: STOCK_MARKET.silver.basePrice,
+                minPrice: STOCK_MARKET.silver.minPrice,
+                maxPrice: STOCK_MARKET.silver.maxPrice,
+                volatility: STOCK_MARKET.silver.volatility,
                 quantity: 0
             }
         };
+        this.activeShocks = [];
         this.insiderInfo = {
             hasInfo: false,
             roundsRemaining: 0,
             revealedShock: null,
             purchaseRound: null
         };
+    }
+
+    _round(value) {
+        return Math.round(value);
+    }
+
+    _getShockPriceFactor(effects = {}) {
+        let factor = 1;
+
+        if (effects.demandA) factor *= effects.demandA;
+        if (effects.costA) factor *= effects.costA;
+        if (effects.costB) factor *= effects.costB;
+        if (effects.costC) factor *= effects.costC;
+        if (effects.demandB) factor *= (2 - effects.demandB);
+
+        return Math.max(0.6, Math.min(1.8, factor));
+    }
+
+    _applyActiveShockPressure() {
+        this.activeShocks.forEach(({ shock }) => {
+            const marketEffects = shock.marketEffects || {};
+
+            Object.entries(marketEffects).forEach(([metalKey, effects]) => {
+                const metal = this.metals[metalKey];
+                if (!metal) return;
+
+                const factor = this._getShockPriceFactor(effects);
+                metal.currentPrice = this._round(
+                    Math.max(metal.minPrice, Math.min(metal.maxPrice, metal.currentPrice * factor))
+                );
+            });
+        });
     }
 
     update() {
@@ -40,6 +73,13 @@ class StockMarket {
             );
         });
 
+        this._applyActiveShockPressure();
+
+        this.activeShocks = this.activeShocks.filter((item) => {
+            item.roundsRemaining -= 1;
+            return item.roundsRemaining > 0;
+        });
+
         if (this.insiderInfo.hasInfo) {
             this.insiderInfo.roundsRemaining -= 1;
             if (this.insiderInfo.roundsRemaining <= 0) {
@@ -51,6 +91,17 @@ class StockMarket {
                 };
             }
         }
+    }
+
+    applyShock(shock) {
+        if (!shock?.marketEffects) return;
+
+        this.activeShocks.push({
+            shock,
+            roundsRemaining: shock.duration || 1
+        });
+
+        this._applyActiveShockPressure();
     }
 
     buyMetal(metalType, quantity, playerCapital) {
@@ -113,6 +164,10 @@ class StockMarket {
     getState() {
         return {
             metals: this.metals,
+            activeShocks: this.activeShocks.map((item) => ({
+                name: item.shock.name,
+                roundsRemaining: item.roundsRemaining
+            })),
             insiderInfo: this.insiderInfo,
             currentRound: this.currentRound
         };

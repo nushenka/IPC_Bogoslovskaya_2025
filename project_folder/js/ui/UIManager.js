@@ -25,9 +25,10 @@ class UIManager {
 
         document.getElementById("btnBuyGold")?.addEventListener("click", () => this.buyMetal("gold"));
         document.getElementById("btnSellGold")?.addEventListener("click", () => this.sellMetal("gold"));
-        document.getElementById("btnBuyPlatinum")?.addEventListener("click", () => this.buyMetal("platinum"));
-        document.getElementById("btnSellPlatinum")?.addEventListener("click", () => this.sellMetal("platinum"));
+        document.getElementById("btnBuySilver")?.addEventListener("click", () => this.buyMetal("silver"));
+        document.getElementById("btnSellSilver")?.addEventListener("click", () => this.sellMetal("silver"));
         document.getElementById("btnInsiderInfo")?.addEventListener("click", () => this.buyInsiderInfo());
+        document.getElementById("btnTakeLoan")?.addEventListener("click", () => this.takeLoan());
     }
 
     updateUI() {
@@ -37,6 +38,7 @@ class UIManager {
         this.updateCompaniesList(state);
         this.updateControlPanel();
         this.updateShockPanel(state);
+        this.updateBankPanel(state);
         this.updateStockMarketPanel(state);
     }
 
@@ -60,7 +62,7 @@ class UIManager {
 
         set("inflationRate", `${state.economy.inflation.toFixed(1)}%`);
         set("interestRate", `${state.economy.interestRate.toFixed(1)}%`);
-        set("taxRate", `${state.economy.taxRate}%`);
+        set("taxRate", `${state.economy.taxRate} ден. ед. / ед.`);
     }
 
     updateShockPanel(state) {
@@ -108,8 +110,8 @@ class UIManager {
                     <div class="company-title">
                         <h4>${company.name}</h4>
                         <span class="company-type">${company.getMarketStructureName()}</span>
+                        <span class="company-profit">${status}</span>
                     </div>
-                    <span class="company-profit">${status}</span>
                 </div>
                 <div class="company-details">
                     <div class="detail-row">
@@ -174,6 +176,7 @@ class UIManager {
         const company = this.selectedCompany;
         const info = company.getDetailedInfo();
         const decision = company.getPlayerDecision();
+        const unitTax = this.gameEngine.getGameState().economy.taxRate;
 
         const competitorHtml = (company.marketStructure === "cournot" || company.marketStructure === "stackelberg_leader" || company.marketStructure === "stackelberg_follower")
             ? `
@@ -213,7 +216,7 @@ class UIManager {
             </div>
             <div class="detail-item">
                 <span class="detail-label">Важно:</span>
-                <span class="detail-value">Не забудьте учесть налог текущего раунда в своих расчётах.</span>
+                <span class="detail-value">Не забудьте учесть налог: ${unitTax} ден. ед. на 1 единицу продукции.</span>
             </div>
             ${competitorHtml}
             ${pendingText}
@@ -342,9 +345,9 @@ class UIManager {
         };
 
         set("goldPrice", `${fmt(market.metals.gold.currentPrice)} ₽/ед.`);
-        set("platinumPrice", `${fmt(market.metals.platinum.currentPrice)} ₽/ед.`);
+        set("silverPrice", `${fmt(market.metals.silver.currentPrice)} ₽/ед.`);
         set("goldQty", `В портфеле: ${market.metals.gold.quantity} ед.`);
-        set("platinumQty", `В портфеле: ${market.metals.platinum.quantity} ед.`);
+        set("silverQty", `В портфеле: ${market.metals.silver.quantity} ед.`);
 
         const insiderEl = document.getElementById("insiderInfoDisplay");
         if (!insiderEl) return;
@@ -359,6 +362,34 @@ class UIManager {
         } else {
             insiderEl.innerHTML = '<div class="insider-inactive">ℹ️ Нет активной инсайдерской информации</div>';
         }
+    }
+
+    updateBankPanel(state) {
+        const bank = state.bank;
+        if (!bank) return;
+
+        const set = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        };
+
+        set("bankLoanRate", `Ставка: ${(bank.interestRate).toFixed(1)}%`);
+        set("bankLoanInfo", `К возврату через ${bank.defaultDuration} раунда по ставке ЦБ + 1 п.п.`);
+
+        const loansEl = document.getElementById("bankLoansList");
+        if (!loansEl) return;
+
+        if (!bank.loans?.length) {
+            loansEl.innerHTML = "Активных займов нет";
+            return;
+        }
+
+        loansEl.innerHTML = bank.loans.map((loan) => `
+            <div class="detail-row">
+                <span>${Math.round(loan.amount).toLocaleString("ru-RU")} ₽ до раунда ${loan.dueRound}</span>
+                <span>${Math.round(loan.totalDue).toLocaleString("ru-RU")} ₽</span>
+            </div>
+        `).join("");
     }
 
     buyMetal(type) {
@@ -396,6 +427,19 @@ class UIManager {
             this.showToast(`Инсайд куплен: ${result.shock.name}`);
         } else {
             this.showToast("Недостаточно средств или информация уже куплена", "error");
+        }
+    }
+
+    takeLoan() {
+        const amount = Number(document.getElementById("loanAmountInput")?.value || "0");
+        const result = this.gameEngine.takeLoan(amount);
+
+        if (result?.success) {
+            this.gameEngine.player.netWorth = this.gameEngine.player.calculateNetWorth();
+            this.updateUI();
+            this.showToast(result.message);
+        } else {
+            this.showToast(result?.message || "Не удалось оформить займ", "error");
         }
     }
 
@@ -536,6 +580,14 @@ class UIManager {
     showDecisionNotifications(result) {
         if (result?.newShock) {
             this.showToast(`Новый шок: ${result.newShock.name}`, "error");
+        }
+
+        if (result?.loanReports?.length) {
+            result.loanReports.forEach((loanReport, index) => {
+                setTimeout(() => {
+                    this.showToast(`Автосписание по займу: ${Math.round(loanReport.totalDue).toLocaleString("ru-RU")} ₽`, "error");
+                }, index * 700);
+            });
         }
 
         if (!result?.decisionReports?.length) return;
