@@ -1,44 +1,25 @@
-project_folder/
-├── index.html                  # Точка входа приложения
-├── main.js                     # Инициализация GameEngine и UIManager
-├── style.css                   # Глобальные стили интерфейса
-│
-├── js/
-│   │
-│   ├── config/                 # Конфигурация игры и данные сценариев
-│   │   ├── businessConfig.js   # Набор компаний и параметры рыночных задач
-│   │   ├── constants.js        # Константы рынка и список шоков
-│   │   └── shockConfig.js      # Дополнительная конфигурация шоков
-│   │
-│   ├── game/                   # Игровой цикл и логика раундов
-│   │   ├── GameEngine.js       # Главный движок: раунды, капитал, компании, шоки
-│   │   ├── roundManager.js     # Управление раундами
-│   │   └── decisionChecker.js  # Проверка решений игрока
-│   │
-│   ├── models/                 # Модели данных и экономическая логика
-│   │   ├── Company.js          # Компания и расчёты по рыночным структурам
-│   │   ├── Player.js           # Игрок и его капитал/активы
-│   │   ├── Bank.js             # Банк и кредиты
-│   │   ├── StockMarket.js      # Рынок металлов и инсайдерской информации
-│   │   ├── EconomicEnvironment.js # Макроэкономическая среда
-│   │   ├── Competitor.js       # Модель конкурента
-│   │   ├── Shock.js            # Экономический шок
-│   │   ├── Demand.js           # Модель спроса
-│   │   ├── Cost.js             # Модель издержек
-│   │   ├── Asset.js            # Базовый класс актива
-│   │   ├── MetalAsset.js       # Металлические активы
-│   │   ├── Stock.js            # Акции и рыночные бумаги
-│   │   └── GovernmentPolicy.js # Налоги и государственная политика
-│   │
-│   ├── ui/                     # Интерфейс и взаимодействие с игроком
-│   │   ├── UIManager.js        # Основной менеджер интерфейса
-│   │   ├── ui.js               # Общие UI-функции
-│   │   ├── displayCompanies.js # Отображение карточек компаний
-│   │   └── controls/           # UI-контролы
-│   │       ├── ButtonManager.js # Управление кнопками
-│   │       ├── InputManager.js  # Управление вводом
-│   │       └── ModalManager.js  # Модальные окна
-│   │
-│   └── utils/                  # Вспомогательные утилиты
-│       └── formatters.js       # Форматирование чисел и значений
-
+```
+├── assets
+│   ├── charts
+│   └── images
+├── index.html
+├── js
+│   ├── config
+│   │   ├── businessConfig.js
+│   │   └── constants.js
+│   ├── game
+│   │   └── GameEngine.js
+│   ├── models
+│   │   ├── Bank.js
+│   │   ├── Company.js
+│   │   ├── EconomicEnvironment.js
+│   │   ├── Player.js
+│   │   └── StockMarket.js
+│   ├── ui
+│   │   ├── UIManager.js
+│   │   └── controls
+│   └── utils
+│       └── formatters.js
+├── main.js
+└── style.css
+```
