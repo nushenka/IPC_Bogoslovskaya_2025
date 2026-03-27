@@ -287,6 +287,51 @@ class Company {
         }, taxRate);
     }
 
+    _solveStackelbergFollower(taxRate = 0) {
+        const a = this.demandA * this.demandMultiplier;
+        const b = this.demandB;
+        const unitTax = this._getUnitTax(taxRate);
+
+        const followerDenominator = 2 * b + 2 * this.costA * this.costMultiplier;
+        const followerReaction = (leaderQ) => {
+            if (followerDenominator <= 0) return 0;
+            return Math.max(0, (a - this.costB * this.costMultiplier - unitTax - b * leaderQ) / followerDenominator);
+        };
+
+        const maxQ = Math.max(1, Math.ceil(a / Math.max(b, 1)));
+        let bestLeader = null;
+
+        for (let step = 0; step <= maxQ * 20; step++) {
+            const leaderQ = step / 2;
+            const followerQ = followerReaction(leaderQ);
+            const totalQ = leaderQ + followerQ;
+            const P = Math.max(0, a - b * totalQ);
+            const leaderTc = this.competitorCostA * leaderQ * leaderQ + this.competitorCostB * leaderQ + this.competitorCostC + unitTax * leaderQ;
+            const leaderProfit = P * leaderQ - leaderTc;
+
+            if (!bestLeader || leaderProfit > bestLeader.leaderProfit) {
+                bestLeader = { leaderQ, followerQ, totalQ, P, leaderProfit };
+            }
+        }
+
+        const Q = bestLeader?.followerQ || 0;
+        const leaderQ = bestLeader?.leaderQ || 0;
+        const P = bestLeader?.P || Math.max(0, a);
+        const tc = this._tc(Q, taxRate);
+        const rev = P * Q;
+
+        return this._applyShutdownRule({
+            Q,
+            Q2: leaderQ,
+            P,
+            Qtotal: Q + leaderQ,
+            tc,
+            rev,
+            profit: rev - tc,
+            reactionFollower: `Q = max(0, (${this._round(a)} - ${this._round(this.costB * this.costMultiplier + unitTax)} - ${b}Q_лидера) / ${this._round(followerDenominator)})`
+        }, taxRate);
+    }
+
     getTheoreticalOutcome(taxRate = 0) {
         switch (this.marketStructure) {
             case "monopoly":
@@ -294,8 +339,9 @@ class Company {
             case "cournot":
                 return { ...this._solveCournot(taxRate), marketStructure: this.marketStructure };
             case "stackelberg_leader":
-            case "stackelberg_follower":
                 return { ...this._solveStackelbergLeader(taxRate), marketStructure: this.marketStructure };
+            case "stackelberg_follower":
+                return { ...this._solveStackelbergFollower(taxRate), marketStructure: this.marketStructure };
             case "perfect_competition":
             default:
                 return { ...this._solvePerfectCompetition(taxRate), marketStructure: this.marketStructure };
