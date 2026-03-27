@@ -1,4 +1,3 @@
-// js/ui/UIManager.js
 class UIManager {
     constructor(gameEngine) {
         this.gameEngine = gameEngine;

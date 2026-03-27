@@ -1,4 +1,3 @@
-// js/models/Company.js
 class Company {
     constructor(config) {
         this.id = config.id || `company_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;

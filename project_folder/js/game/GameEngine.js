@@ -1,4 +1,3 @@
-// js/game/GameEngine.js
 import { BUSINESS_TYPES } from "../config/businessConfig.js";
 import { SHOCKS } from "../config/constants.js";
 import { Bank } from "../models/Bank.js";
@@ -21,20 +20,13 @@ class GameEngine {
     initialize() {
         console.log('Инициализация игры...');
         
-        // Создаем экономическую среду
         this.economy = new EconomicEnvironment();
-        
-        // Создаем игрока
         this.player = new Player({
             capital: 1000000,
             netWorth: 1000000
         });
-        
-        // Создаем банк и биржу
         this.bank = new Bank();
         this.stockMarket = new StockMarket();
-        
-        // Создаем доступные компании
         this.initializeCompanies();
         
         console.log('Игра инициализирована!');
@@ -47,10 +39,9 @@ class GameEngine {
         this.availableCompanies = [];
         
         BUSINESS_TYPES.forEach(config => {
-            // Исправляем marketType → marketStructure
             const companyConfig = {
                 ...config,
-                marketStructure: config.marketType // Исправление!
+                marketStructure: config.marketType
             };
             const company = new Company(companyConfig);
             this.availableCompanies.push(company);
@@ -68,19 +59,12 @@ class GameEngine {
     const company = this.availableCompanies[companyIndex];
     
     if (this.player.capital >= company.basePrice) {
-        // Делаем копию компании для игрока
         const playerCompany = new Company(company.config);
         playerCompany.ownedByPlayer = true;
-        
-        //  ВАЖНО: Рандомизируем коэффициенты издержек
         playerCompany.randomizeCosts();
-        
-        // Добавляем игроку
         this.player.addCompany(playerCompany);
         this.player.capital -= company.basePrice;
         this.player.netWorth = this.player.calculateNetWorth();
-        
-        // Удаляем из доступных
         this.availableCompanies.splice(companyIndex, 1);
         
         console.log('Компания куплена:', playerCompany.name);
@@ -102,22 +86,12 @@ class GameEngine {
     
     const company = this.player.companies[companyIndex];
     
-    // Продаем за 70% от базовой цены
     const sellPrice = Math.round(company.basePrice * 0.7);
-    
-    // Возвращаем деньги игроку
     this.player.capital += sellPrice;
-    
-    // Возвращаем компанию в доступные (со стандартными коэффициентами)
     const availableCompany = new Company(company.config);
     availableCompany.ownedByPlayer = false;
-    // НЕ вызываем randomizeCosts() - для непокупных компаний стандартные коэффициенты
     this.availableCompanies.push(availableCompany);
-    
-    // Удаляем у игрока
     this.player.companies.splice(companyIndex, 1);
-    
-    // Обновляем чистую стоимость
     this.player.netWorth = this.player.calculateNetWorth();
     
     console.log(`Компания "${company.name}" продана за ${sellPrice.toLocaleString()}₽`);
@@ -144,27 +118,22 @@ class GameEngine {
         return true;
     }
     
-    // Взять кредит
     takeLoan(amount) {
         return this.bank.takeLoan(this.player, amount, this.economy.interestRate);
     }
-    
-    // Купить металл на бирже
+
     buyMetal(metalType, quantity) {
         return this.stockMarket.buyMetal(metalType, quantity, this.player.capital);
     }
-    
-    // Продать металл
+
     sellMetal(metalType, quantity) {
         return this.stockMarket.sellMetal(metalType, quantity);
     }
-    
-    // Купить инсайдерскую информацию
+
     buyInsiderInfo() {
         return this.stockMarket.buyInsiderInfo(this.player.capital);
     }
-    
-    // Применить шок ко всем компаниям
+
     applyShock(shock) {
         console.log(`Применяется шок: ${shock.name}`);
         
@@ -174,7 +143,6 @@ class GameEngine {
             roundsRemaining: shock.duration || 1
         });
         
-        // Применяем шок к компаниям игрока
         this.player.companies.forEach(company => {
             company.applyShock(shock);
         });
@@ -185,7 +153,6 @@ class GameEngine {
         return shock;
     }
     
-    // Получить случайный шок
     getRandomShock() {
         if (!SHOCKS || SHOCKS.length === 0) return null;
         const randomIndex = Math.floor(Math.random() * SHOCKS.length);
@@ -195,20 +162,14 @@ class GameEngine {
     nextRound() {
         console.log(`=== Начало раунда ${this.currentRound} ===`);
         
-        // 1. Обновляем экономику
         this.economy.update();
-        
-        // 2. Обновляем банк и биржу
         const loanReports = this.bank.update(this.player, this.economy.interestRate);
         this.stockMarket.update();
-
-        // 3. Сначала уменьшаем срок жизни уже действующих шоков
         this.player.companies.forEach(company => {
             company.updateShocks();
         });
         this.updateActiveShocks();
-        
-        // 4. Со второго раунда шок появляется гарантированно
+
         let newShock = null;
         if (this.currentRound >= 2 && SHOCKS && SHOCKS.length > 0) {
             const shock = this.getRandomShock();
@@ -218,7 +179,6 @@ class GameEngine {
             }
         }
         
-        // 5. Рассчитываем результаты компаний по сохранённым решениям игрока
         let totalProfit = 0;
         const companyProfits = [];
         const decisionReports = [];
@@ -238,7 +198,6 @@ class GameEngine {
             });
         });
         
-        // 6. Обновляем капитал игрока
         this.player.capital += totalProfit;
         this.player.netWorth = this.player.calculateNetWorth();
         
@@ -288,12 +247,8 @@ class GameEngine {
         };
     }
     
-    // Получить детали компании по ID
     getCompanyDetails(companyId) {
-        // Ищем в компаниях игрока
         let company = this.player.companies.find(c => c.id === companyId);
-        
-        // Если не нашли, ищем в доступных
         if (!company) {
             company = this.availableCompanies.find(c => c.id === companyId);
         }
@@ -301,7 +256,6 @@ class GameEngine {
         return company ? company.getDetailedInfo() : null;
     }
     
-    // Получить финансовый отчет
     getFinancialReport() {
         const state = this.getGameState();
         

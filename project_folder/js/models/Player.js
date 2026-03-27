@@ -1,4 +1,3 @@
-// js/models/Player.js
 class Player {
     constructor(config = {}) {
         this.capital = config.capital || 1000000;
@@ -17,7 +16,6 @@ class Player {
     calculateNetWorth() {
         let worth = this.capital;
         
-        // Добавляем стоимость компаний
         this.companies.forEach(company => {
             worth += company.basePrice;
         });

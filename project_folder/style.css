@@ -1,8 +1,3 @@
-/* ═══════════════════════════════════════════════════════════════
-   ВШЭ Экономический Симулятор — Pastel Theme
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ── Переменные ─────────────────────────────────────────────── */
 :root {
     --bg-main:       #f0f4ff;
     --bg-card:       #ffffff;
@@ -45,7 +40,6 @@
     --font-mono:     'JetBrains Mono', monospace;
 }
 
-/* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
@@ -53,14 +47,12 @@ body {
     background: var(--bg-main);
     color: var(--text-main);
     min-height: 100vh;
-    /* Фоновый паттерн — мягкая сетка */
     background-image:
         radial-gradient(circle at 20% 20%, rgba(167,139,250,0.12) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(107,159,247,0.12) 0%, transparent 50%),
         url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c7d7fd' fill-opacity='0.25'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* ── Контейнер ──────────────────────────────────────────────── */
 .game-container {
     display: flex;
     flex-direction: column;
@@ -69,7 +61,6 @@ body {
     margin: 0 auto;
 }
 
-/* ── Шапка ──────────────────────────────────────────────────── */
 .game-header {
     background: linear-gradient(135deg, #667eea 0%, #a78bfa 100%);
     color: white;
@@ -140,7 +131,6 @@ body {
     font-weight: 700;
 }
 
-/* ── Основная область ───────────────────────────────────────── */
 .game-main {
     display: flex;
     flex: 1;
@@ -190,7 +180,6 @@ body {
     color: var(--text-main);
 }
 
-/* ── Кнопки ─────────────────────────────────────────────────── */
 .btn {
     padding: 10px 18px;
     border: none;
@@ -227,7 +216,6 @@ body {
     box-shadow: none !important;
 }
 
-/* ── Компании ────────────────────────────────────────────────── */
 .companies-list {
     max-height: calc(100vh - 230px);
     overflow-y: auto;
@@ -367,7 +355,6 @@ body {
     font-size: 0.95rem;
 }
 
-/* ── Управление ─────────────────────────────────────────────── */
 .selected-name {
     font-size: 1.2rem;
     font-weight: 800;
@@ -441,7 +428,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* ── График ──────────────────────────────────────────────────── */
 .chart-container {
     height: 220px;
     background: var(--bg-soft);
@@ -451,7 +437,6 @@ body {
     margin-bottom: 16px;
 }
 
-/* ── Детали компании ─────────────────────────────────────────── */
 .company-details-panel {
     background: var(--bg-soft);
     border-radius: var(--radius);
@@ -574,7 +559,6 @@ body {
     font-weight: 700;
 }
 
-/* ── Проверка прибыли ────────────────────────────────────────── */
 .profit-checker {
     margin-top: 16px;
     background: var(--yellow-light);
@@ -614,7 +598,6 @@ body {
     opacity: 0.85;
 }
 
-/* ── Нет компании ────────────────────────────────────────────── */
 .no-company-message {
     text-align: center;
     padding: 60px 20px;
@@ -630,7 +613,6 @@ body {
 .no-company-message h3 { color: var(--text-mid); margin-bottom: 8px; font-size: 1.1rem; }
 .no-company-message p  { font-size: 0.9rem; }
 
-/* ── Аналитика ───────────────────────────────────────────────── */
 .quick-analytics {
     background: var(--bg-soft);
     border-radius: var(--radius);
@@ -650,7 +632,6 @@ body {
     font-weight: 700;
 }
 
-/* ── Золотовалютный рынок ────────────────────────────────────── */
 .panel-section { }
 
 .section-title {
@@ -730,7 +711,6 @@ body {
     padding-top: 4px;
 }
 
-/* ── Футер ───────────────────────────────────────────────────── */
 .game-footer {
     background: white;
     padding: 14px 28px;
@@ -760,7 +740,6 @@ body {
     border: 1px solid var(--border);
 }
 
-/* ── Модальные окна ──────────────────────────────────────────── */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -858,7 +837,6 @@ body {
     border-top: 1px solid var(--border);
 }
 
-/* ── Тост ────────────────────────────────────────────────────── */
 .game-toast {
     position: fixed;
     bottom: 80px;
@@ -885,7 +863,6 @@ body {
 .toast-success { background: var(--green-dark); color: white; }
 .toast-error   { background: var(--red-dark);   color: white; }
 
-/* ── Анимации ────────────────────────────────────────────────── */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -893,13 +870,11 @@ body {
 
 .business-controls { animation: fadeIn 0.25s ease; }
 
-/* ── Скроллбар ───────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-soft); border-radius: 3px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--blue); }
 
-/* ── Адаптивность ────────────────────────────────────────────── */
 @media (max-width: 1200px) {
     .game-main { flex-direction: column; }
     .businesses-panel, .analytics-panel { flex: 0 0 auto; width: 100%; max-height: none; }

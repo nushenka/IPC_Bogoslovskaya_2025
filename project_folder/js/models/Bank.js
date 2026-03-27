@@ -1,4 +1,3 @@
-// js/models/Bank.js
 class Bank {
     constructor() {
         this.loans = [];

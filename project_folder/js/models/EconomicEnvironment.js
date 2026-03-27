@@ -1,4 +1,3 @@
-// js/models/EconomicEnvironment.js
 class EconomicEnvironment {
     constructor() {
         this.baseInflation = 5;
