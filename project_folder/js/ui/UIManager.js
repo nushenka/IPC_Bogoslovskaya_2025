@@ -624,57 +624,62 @@ class UIManager {
     }
 
     showDecisionNotifications(result) {
-        if (result?.newShock) {
-            this.showToast(`Новый шок: ${result.newShock.name}`, "error");
-        }
-
         const companyNameById = new Map(
             [...this.gameEngine.player.companies, ...this.gameEngine.availableCompanies]
                 .map((company) => [company.id, company.name])
         );
 
-        result?.marketChanges?.companyChanges?.slice(0, 4).forEach((change, index) => {
-            const companyName = companyNameById.get(change.companyId) || change.companyId;
-            const diffPercent = Math.round(((change.after - change.before) / Math.max(change.before, 1)) * 100);
-            setTimeout(() => {
-                this.showToast(`Цена компании ${companyName}: ${diffPercent >= 0 ? "+" : ""}${diffPercent}%`, diffPercent >= 0 ? "success" : "error");
-            }, 300 + index * 700);
-        });
+        let delay = 0;
+        const queueToast = (message, type = "success") => {
+            setTimeout(() => this.showToast(message, type), delay);
+            delay += 5400;
+        };
 
-        result?.marketChanges?.assetChanges?.forEach((change, index) => {
-            const assetName = change.asset === "gold" ? "золото" : "серебро";
-            const diffPercent = Math.round(((change.after - change.before) / Math.max(change.before, 1)) * 100);
-            setTimeout(() => {
-                this.showToast(`Котировка ${assetName}: ${diffPercent >= 0 ? "+" : ""}${diffPercent}%`, diffPercent >= 0 ? "success" : "error");
-            }, 500 + index * 700);
-        });
-
-        if (result?.marketChanges?.interestRateChanged) {
-            const { before, after } = result.marketChanges.interestRateChanged;
-            const diff = (after - before).toFixed(1);
-            this.showToast(`Ставка ЦБ изменилась: ${before.toFixed(1)}% → ${after.toFixed(1)}% (${Number(diff) >= 0 ? "+" : ""}${diff} п.п.)`, Number(diff) >= 0 ? "error" : "success");
-        }
-
-        if (result?.loanReports?.length) {
-            result.loanReports.forEach((loanReport, index) => {
-                setTimeout(() => {
-                    this.showToast(`Автосписание по займу: ${Math.round(loanReport.totalDue).toLocaleString("ru-RU")} ₽`, "error");
-                }, index * 700);
-            });
-        }
-
-        if (!result?.decisionReports?.length) return;
-
-        result.decisionReports
+        (result?.decisionReports || [])
             .filter((report) => report.submitted)
-            .forEach((report, index) => {
+            .forEach((report) => {
                 const amount = Math.round(report.actualProfit).toLocaleString("ru-RU");
                 const outcome = report.actualProfit >= 0 ? `+${amount} ₽ к капиталу` : `${amount} ₽ к капиталу`;
                 const message = report.isCorrect
                     ? `${report.companyName}: решение верное, ${outcome}`
                     : `${report.companyName}: решение неверное, фактический результат ${outcome}`;
-                setTimeout(() => this.showToast(message, report.actualProfit >= 0 ? "success" : "error"), index * 900);
+                queueToast(message, report.actualProfit >= 0 ? "success" : "error");
             });
+
+        (result?.loanReports || []).forEach((loanReport) => {
+            queueToast(`Автосписание по займу: ${Math.round(loanReport.totalDue).toLocaleString("ru-RU")} ₽`, "error");
+        });
+
+        if (result?.marketChanges?.interestRateChanged) {
+            const { before, after } = result.marketChanges.interestRateChanged;
+            const diff = (after - before).toFixed(1);
+            queueToast(
+                `Ставка ЦБ изменилась: ${before.toFixed(1)}% → ${after.toFixed(1)}% (${Number(diff) >= 0 ? "+" : ""}${diff} п.п.)`,
+                Number(diff) >= 0 ? "error" : "success"
+            );
+        }
+
+        if (result?.newShock) {
+            queueToast(`Новый шок: ${result.newShock.name}`, "error");
+        }
+
+        (result?.marketChanges?.companyChanges || []).slice(0, 4).forEach((change) => {
+            const companyName = companyNameById.get(change.companyId) || change.companyId;
+            const diffPercent = Math.round(((change.after - change.before) / Math.max(change.before, 1)) * 100);
+            queueToast(
+                `Цена компании ${companyName}: ${diffPercent >= 0 ? "+" : ""}${diffPercent}%`,
+                diffPercent >= 0 ? "success" : "error"
+            );
+        });
+
+        (result?.marketChanges?.assetChanges || []).forEach((change) => {
+            const assetName = change.asset === "gold" ? "золото" : "серебро";
+            const diffPercent = Math.round(((change.after - change.before) / Math.max(change.before, 1)) * 100);
+            queueToast(
+                `Котировка ${assetName}: ${diffPercent >= 0 ? "+" : ""}${diffPercent}%`,
+                diffPercent >= 0 ? "success" : "error"
+            );
+        });
     }
 
     showToast(message, type = "success") {
@@ -688,7 +693,7 @@ class UIManager {
         setTimeout(() => {
             toast.classList.remove("toast-visible");
             setTimeout(() => toast.remove(), 300);
-        }, 2600);
+        }, 5200);
     }
 
 }
