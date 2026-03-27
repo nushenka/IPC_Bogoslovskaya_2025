@@ -25,7 +25,7 @@ export const BUSINESS_TYPES = [
         demandB: 1,
         costA: 0,
         costB: 10,
-        costC: 120,
+        costC: 1,
         description: "Строительная компания. Работает в условиях совершенной конкуренции.",
         minPrice: 10,
         maxPrice: 100
