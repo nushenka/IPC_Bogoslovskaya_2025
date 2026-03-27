@@ -316,6 +316,94 @@ export const SHOCKS = [
         duration: 2
     },
     {
+        id: "interest_rate_shock",
+        name: "Жесткая денежно-кредитная политика",
+        target: "all",
+        description: "Рост ключевой ставки снижает стоимость компаний, зависящих от кредитов и спроса.",
+        economy: {
+            interestRateDelta: 3,
+            globalDemandDelta: -4
+        },
+        companyValueEffects: {
+            vshe_stroy: 0.8,
+            vshe_sklad: 0.9,
+            vshe_magazin: 0.88,
+            vshe_line: 0.95,
+            vshe_taxi: 0.9,
+            vshe_neft: 0.96
+        },
+        duration: 2
+    },
+    {
+        id: "commodity_price_shock",
+        name: "Рост цен на сырье и энергию",
+        target: "all",
+        description: "Энергия и сырье дорожают, что меняет стоимость реального бизнеса и активов.",
+        economy: {
+            inflationDelta: 2
+        },
+        companyValueEffects: {
+            vshe_neft: 1.18,
+            vshe_stroy: 0.9,
+            vshe_magazin: 0.92,
+            vshe_sklad: 0.91,
+            vshe_line: 0.96,
+            vshe_taxi: 0.88
+        },
+        duration: 2
+    },
+    {
+        id: "consumer_demand_shock",
+        name: "Потребительский кризис",
+        target: "all",
+        description: "Снижение доходов населения давит на торговлю, такси, строительство и логистику.",
+        economy: {
+            globalDemandDelta: -7
+        },
+        companyValueEffects: {
+            vshe_magazin: 0.8,
+            vshe_taxi: 0.86,
+            vshe_stroy: 0.84,
+            vshe_sklad: 0.88,
+            vshe_line: 0.97,
+            vshe_neft: 0.94
+        },
+        duration: 3
+    },
+    {
+        id: "regulation_shock",
+        name: "Новый регуляторный режим",
+        target: "all",
+        description: "Новые нормы, ограничения и налоги меняют привлекательность компаний.",
+        economy: {
+            taxRateDelta: 1
+        },
+        companyValueEffects: {
+            vshe_taxi: 0.78,
+            vshe_neft: 0.82,
+            vshe_line: 0.9,
+            vshe_stroy: 0.9,
+            vshe_magazin: 0.92,
+            vshe_sklad: 0.95
+        },
+        duration: 2
+    },
+    {
+        id: "technology_shock",
+        name: "Технологический скачок",
+        target: "all",
+        description: "Новые технологии и цифровизация перераспределяют стоимость компаний.",
+        companyValueEffects: {
+            vshe_line: 1.18,
+            vshe_taxi: 1.08,
+            vshe_magazin: 1.1,
+            vshe_sklad: 1.16,
+            vshe_stroy: 1.06,
+            vshe_neft: 1.02
+        },
+        duration: 3
+    },
+    {
         id: "gold_mine_strike",
         name: "Забастовка на золотых рудниках",
         target: "market",

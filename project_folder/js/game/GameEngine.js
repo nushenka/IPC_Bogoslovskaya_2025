@@ -134,6 +134,63 @@ class GameEngine {
         return this.stockMarket.buyInsiderInfo(this.player.capital);
     }
 
+    snapshotMarketState() {
+        const companies = [...this.player.companies, ...this.availableCompanies];
+        const companyPrices = Object.fromEntries(
+            companies.map((company) => [company.id, Math.round(company.basePrice)])
+        );
+
+        const assetPrices = Object.fromEntries(
+            Object.entries(this.stockMarket.metals).map(([key, metal]) => [key, Math.round(metal.currentPrice)])
+        );
+
+        return {
+            companyPrices,
+            assetPrices,
+            interestRate: this.economy.interestRate
+        };
+    }
+
+    applyCompanyValueShock(shock) {
+        const effects = shock.companyValueEffects;
+        if (!effects) return;
+
+        [...this.player.companies, ...this.availableCompanies].forEach((company) => {
+            const multiplier = effects[company.id];
+            if (!multiplier) return;
+            company.basePrice = Math.max(50000, Math.round(company.basePrice * multiplier));
+        });
+    }
+
+    buildChangeNotifications(beforeState, afterState) {
+        const companyChanges = Object.entries(afterState.companyPrices)
+            .filter(([companyId, price]) => beforeState.companyPrices[companyId] !== undefined && beforeState.companyPrices[companyId] !== price)
+            .map(([companyId, price]) => ({
+                companyId,
+                before: beforeState.companyPrices[companyId],
+                after: price
+            }));
+
+        const assetChanges = Object.entries(afterState.assetPrices)
+            .filter(([asset, price]) => beforeState.assetPrices[asset] !== undefined && beforeState.assetPrices[asset] !== price)
+            .map(([asset, price]) => ({
+                asset,
+                before: beforeState.assetPrices[asset],
+                after: price
+            }));
+
+        return {
+            companyChanges,
+            assetChanges,
+            interestRateChanged: beforeState.interestRate !== afterState.interestRate
+                ? {
+                    before: beforeState.interestRate,
+                    after: afterState.interestRate
+                }
+                : null
+        };
+    }
+
     applyShock(shock) {
         console.log(`Применяется шок: ${shock.name}`);
         
@@ -149,6 +206,7 @@ class GameEngine {
 
         this.economy.applyShock(shock);
         this.stockMarket.applyShock(shock);
+        this.applyCompanyValueShock(shock);
         
         return shock;
     }
@@ -161,7 +219,7 @@ class GameEngine {
     
     nextRound() {
         console.log(`=== Начало раунда ${this.currentRound} ===`);
-        
+        const beforeState = this.snapshotMarketState();
         this.economy.update();
         const loanReports = this.bank.update(this.player, this.economy.interestRate);
         this.stockMarket.update();
@@ -172,7 +230,7 @@ class GameEngine {
 
         let newShock = null;
         if (this.currentRound >= 2 && SHOCKS && SHOCKS.length > 0) {
-            const shock = this.getRandomShock();
+            const shock = this.stockMarket.consumeInsiderShock() || this.getRandomShock();
             if (shock) {
                 this.applyShock(shock);
                 newShock = shock;
@@ -205,12 +263,15 @@ class GameEngine {
         console.log(`Общая прибыль: ${totalProfit.toLocaleString()}₽`);
         console.log(`Капитал игрока: ${this.player.capital.toLocaleString()}₽`);
         
+        const afterState = this.snapshotMarketState();
+        const marketChanges = this.buildChangeNotifications(beforeState, afterState);
         this.currentRound++;
         
         return {
             round: this.currentRound - 1,
             totalProfit: totalProfit,
             newShock: newShock,
+            marketChanges,
             loanReports: loanReports,
             companyProfits: companyProfits,
             decisionReports: decisionReports,

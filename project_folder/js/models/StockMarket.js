@@ -30,7 +30,8 @@ class StockMarket {
             hasInfo: false,
             roundsRemaining: 0,
             revealedShock: null,
-            purchaseRound: null
+            purchaseRound: null,
+            consumed: false
         };
     }
 
@@ -106,7 +107,8 @@ class StockMarket {
                     hasInfo: false,
                     roundsRemaining: 0,
                     revealedShock: null,
-                    purchaseRound: null
+                    purchaseRound: null,
+                    consumed: false
                 };
             }
         }
@@ -171,7 +173,8 @@ class StockMarket {
             hasInfo: true,
             roundsRemaining: STOCK_MARKET.insiderInfo.duration,
             revealedShock: futureShock,
-            purchaseRound: this.currentRound
+            purchaseRound: this.currentRound,
+            consumed: false
         };
 
         return {
@@ -181,7 +184,22 @@ class StockMarket {
         };
     }
 
+    consumeInsiderShock() {
+        if (!this.insiderInfo.hasInfo || this.insiderInfo.consumed) {
+            return null;
+        }
+
+        if (this.currentRound <= this.insiderInfo.purchaseRound) {
+            return null;
+        }
+
+        this.insiderInfo.consumed = true;
+        return this.insiderInfo.revealedShock;
+    }
+
     getState() {
+        const isVisible = this.insiderInfo.hasInfo && this.currentRound > this.insiderInfo.purchaseRound;
+
         return {
             metals: this.metals,
             priceHistory: this.priceHistory,
@@ -189,7 +207,10 @@ class StockMarket {
                 name: item.shock.name,
                 roundsRemaining: item.roundsRemaining
             })),
-            insiderInfo: this.insiderInfo,
+            insiderInfo: {
+                ...this.insiderInfo,
+                revealedShock: isVisible ? this.insiderInfo.revealedShock : null
+            },
             currentRound: this.currentRound
         };
     }

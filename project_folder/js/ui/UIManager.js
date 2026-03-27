@@ -355,12 +355,19 @@ class UIManager {
         if (!insiderEl) return;
 
         if (market.insiderInfo.hasInfo) {
-            insiderEl.innerHTML = `
-            <div class="insider-active">
-                🔍 Инсайд активен (${market.insiderInfo.roundsRemaining} раунда)<br>
-                <strong>${market.insiderInfo.revealedShock?.name || ""}</strong><br>
-                <small>${market.insiderInfo.revealedShock?.description || ""}</small>
-            </div>`;
+            if (market.insiderInfo.revealedShock) {
+                insiderEl.innerHTML = `
+                <div class="insider-active">
+                    🔍 Инсайд активен (${market.insiderInfo.roundsRemaining} раунда)<br>
+                    <strong>${market.insiderInfo.revealedShock.name}</strong><br>
+                    <small>${market.insiderInfo.revealedShock.description || ""}</small>
+                </div>`;
+            } else {
+                insiderEl.innerHTML = `
+                <div class="insider-active">
+                    🔍 Инсайд куплен. Следующий шок будет раскрыт в следующем раунде.
+                </div>`;
+            }
         } else {
             insiderEl.innerHTML = '<div class="insider-inactive">ℹ️ Нет активной инсайдерской информации</div>';
         }
@@ -619,6 +626,33 @@ class UIManager {
     showDecisionNotifications(result) {
         if (result?.newShock) {
             this.showToast(`Новый шок: ${result.newShock.name}`, "error");
+        }
+
+        const companyNameById = new Map(
+            [...this.gameEngine.player.companies, ...this.gameEngine.availableCompanies]
+                .map((company) => [company.id, company.name])
+        );
+
+        result?.marketChanges?.companyChanges?.slice(0, 4).forEach((change, index) => {
+            const companyName = companyNameById.get(change.companyId) || change.companyId;
+            const diffPercent = Math.round(((change.after - change.before) / Math.max(change.before, 1)) * 100);
+            setTimeout(() => {
+                this.showToast(`Цена компании ${companyName}: ${diffPercent >= 0 ? "+" : ""}${diffPercent}%`, diffPercent >= 0 ? "success" : "error");
+            }, 300 + index * 700);
+        });
+
+        result?.marketChanges?.assetChanges?.forEach((change, index) => {
+            const assetName = change.asset === "gold" ? "золото" : "серебро";
+            const diffPercent = Math.round(((change.after - change.before) / Math.max(change.before, 1)) * 100);
+            setTimeout(() => {
+                this.showToast(`Котировка ${assetName}: ${diffPercent >= 0 ? "+" : ""}${diffPercent}%`, diffPercent >= 0 ? "success" : "error");
+            }, 500 + index * 700);
+        });
+
+        if (result?.marketChanges?.interestRateChanged) {
+            const { before, after } = result.marketChanges.interestRateChanged;
+            const diff = (after - before).toFixed(1);
+            this.showToast(`Ставка ЦБ изменилась: ${before.toFixed(1)}% → ${after.toFixed(1)}% (${Number(diff) >= 0 ? "+" : ""}${diff} п.п.)`, Number(diff) >= 0 ? "error" : "success");
         }
 
         if (result?.loanReports?.length) {
