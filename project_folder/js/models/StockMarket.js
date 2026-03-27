@@ -22,6 +22,10 @@ class StockMarket {
             }
         };
         this.activeShocks = [];
+        this.priceHistory = {
+            gold: [STOCK_MARKET.gold.basePrice],
+            silver: [STOCK_MARKET.silver.basePrice]
+        };
         this.insiderInfo = {
             hasInfo: false,
             roundsRemaining: 0,
@@ -62,6 +66,20 @@ class StockMarket {
         });
     }
 
+    _recordHistory() {
+        Object.entries(this.metals).forEach(([metalKey, metal]) => {
+            if (!this.priceHistory[metalKey]) {
+                this.priceHistory[metalKey] = [];
+            }
+
+            this.priceHistory[metalKey].push(metal.currentPrice);
+
+            if (this.priceHistory[metalKey].length > 12) {
+                this.priceHistory[metalKey].shift();
+            }
+        });
+    }
+
     update() {
         this.currentRound += 1;
 
@@ -74,6 +92,7 @@ class StockMarket {
         });
 
         this._applyActiveShockPressure();
+        this._recordHistory();
 
         this.activeShocks = this.activeShocks.filter((item) => {
             item.roundsRemaining -= 1;
@@ -102,6 +121,7 @@ class StockMarket {
         });
 
         this._applyActiveShockPressure();
+        this._recordHistory();
     }
 
     buyMetal(metalType, quantity, playerCapital) {
@@ -164,6 +184,7 @@ class StockMarket {
     getState() {
         return {
             metals: this.metals,
+            priceHistory: this.priceHistory,
             activeShocks: this.activeShocks.map((item) => ({
                 name: item.shock.name,
                 roundsRemaining: item.roundsRemaining

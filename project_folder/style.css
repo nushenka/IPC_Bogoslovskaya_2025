@@ -668,6 +668,15 @@ body {
     padding: 12px;
 }
 
+.market-chart-container {
+    height: 120px;
+    margin: 10px 0 12px;
+    padding: 8px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
 .metal-header {
     display: flex;
     justify-content: space-between;

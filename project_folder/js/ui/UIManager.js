@@ -4,6 +4,7 @@ class UIManager {
         this.gameEngine = gameEngine;
         this.selectedCompany = null;
         this.chartInstance = null;
+        this.marketCharts = {};
     }
 
     initialize() {
@@ -348,6 +349,8 @@ class UIManager {
         set("silverPrice", `${fmt(market.metals.silver.currentPrice)} ₽/ед.`);
         set("goldQty", `В портфеле: ${market.metals.gold.quantity} ед.`);
         set("silverQty", `В портфеле: ${market.metals.silver.quantity} ед.`);
+        this.renderMarketChart("gold", market.priceHistory?.gold || [], "#d4a017");
+        this.renderMarketChart("silver", market.priceHistory?.silver || [], "#8c97a8");
 
         const insiderEl = document.getElementById("insiderInfoDisplay");
         if (!insiderEl) return;
@@ -362,6 +365,43 @@ class UIManager {
         } else {
             insiderEl.innerHTML = '<div class="insider-inactive">ℹ️ Нет активной инсайдерской информации</div>';
         }
+    }
+
+    renderMarketChart(metalType, history, color) {
+        const canvas = document.getElementById(`${metalType}Chart`);
+        if (!canvas || !history.length) return;
+
+        if (this.marketCharts[metalType]) {
+            this.marketCharts[metalType].destroy();
+        }
+
+        this.marketCharts[metalType] = new Chart(canvas, {
+            type: "line",
+            data: {
+                labels: history.map((_, index) => `R${index + 1}`),
+                datasets: [{
+                    label: metalType === "gold" ? "Золото" : "Серебро",
+                    data: history,
+                    borderColor: color,
+                    backgroundColor: `${color}22`,
+                    borderWidth: 2,
+                    pointRadius: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                }
+            }
+        });
     }
 
     updateBankPanel(state) {
