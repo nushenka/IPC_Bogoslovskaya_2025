@@ -31,7 +31,8 @@ class StockMarket {
             roundsRemaining: 0,
             revealedShock: null,
             purchaseRound: null,
-            consumed: false
+            consumed: false,
+            scheduledShockRound: null
         };
     }
 
@@ -108,7 +109,8 @@ class StockMarket {
                     roundsRemaining: 0,
                     revealedShock: null,
                     purchaseRound: null,
-                    consumed: false
+                    consumed: false,
+                    scheduledShockRound: null
                 };
             }
         }
@@ -174,7 +176,8 @@ class StockMarket {
             roundsRemaining: STOCK_MARKET.insiderInfo.duration,
             revealedShock: futureShock,
             purchaseRound: this.currentRound,
-            consumed: false
+            consumed: false,
+            scheduledShockRound: this.currentRound + 1
         };
 
         return {
@@ -184,12 +187,12 @@ class StockMarket {
         };
     }
 
-    consumeInsiderShock() {
+    consumeInsiderShock(roundNumber) {
         if (!this.insiderInfo.hasInfo || this.insiderInfo.consumed) {
             return null;
         }
 
-        if (this.currentRound <= this.insiderInfo.purchaseRound) {
+        if (roundNumber < this.insiderInfo.scheduledShockRound) {
             return null;
         }
 

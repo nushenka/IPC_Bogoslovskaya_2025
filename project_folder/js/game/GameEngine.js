@@ -219,6 +219,7 @@ class GameEngine {
     
     nextRound() {
         console.log(`=== Начало раунда ${this.currentRound} ===`);
+        const upcomingRound = this.currentRound + 1;
         const beforeState = this.snapshotMarketState();
         this.economy.update();
         const loanReports = this.bank.update(this.player, this.economy.interestRate);
@@ -229,8 +230,8 @@ class GameEngine {
         this.updateActiveShocks();
 
         let newShock = null;
-        if (this.currentRound >= 2 && SHOCKS && SHOCKS.length > 0) {
-            const shock = this.stockMarket.consumeInsiderShock() || this.getRandomShock();
+        if (upcomingRound >= 2 && SHOCKS && SHOCKS.length > 0) {
+            const shock = this.stockMarket.consumeInsiderShock(upcomingRound) || this.getRandomShock();
             if (shock) {
                 this.applyShock(shock);
                 newShock = shock;

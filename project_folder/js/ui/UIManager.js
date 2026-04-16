@@ -102,6 +102,8 @@ class UIManager {
         container.innerHTML = state.player.companies.map((company) => {
             const decision = company.getPlayerDecision();
             const status = decision.pendingSubmission ? "Решение сохранено" : "Ожидает решение";
+            const marketValue = Math.round(company.basePrice);
+            const sellValue = Math.round(company.basePrice * 0.7);
 
             return `
             <div class="company-card ${this.selectedCompany?.id === company.id ? "selected" : ""}" data-id="${company.id}">
@@ -114,6 +116,14 @@ class UIManager {
                     </div>
                 </div>
                 <div class="company-details">
+                    <div class="detail-row">
+                        <span>Стоимость:</span>
+                        <span class="detail-value">${marketValue.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Продажа:</span>
+                        <span class="detail-value">${sellValue.toLocaleString("ru-RU")} ₽</span>
+                    </div>
                     <div class="detail-row">
                         <span>Ваш P:</span>
                         <span class="detail-value">${decision.price === "" ? "—" : `${decision.price} ₽`}</span>
@@ -177,6 +187,8 @@ class UIManager {
         const info = company.getDetailedInfo();
         const decision = company.getPlayerDecision();
         const unitTax = this.gameEngine.getGameState().economy.taxRate;
+        const marketValue = Math.round(company.basePrice);
+        const sellValue = Math.round(company.basePrice * 0.7);
 
         const competitorHtml = (company.marketStructure === "cournot" || company.marketStructure === "stackelberg_leader" || company.marketStructure === "stackelberg_follower")
             ? `
@@ -205,6 +217,14 @@ class UIManager {
             <div class="detail-item">
                 <span class="detail-label">Описание:</span>
                 <span class="detail-value">${company.description}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Стоимость компании:</span>
+                <span class="detail-value">${marketValue.toLocaleString("ru-RU")} ₽</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Цена продажи:</span>
+                <span class="detail-value">${sellValue.toLocaleString("ru-RU")} ₽</span>
             </div>
             <div class="detail-item formula-item">
                 <span class="detail-label">Функция спроса:</span>
