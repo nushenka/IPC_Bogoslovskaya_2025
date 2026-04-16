@@ -156,6 +156,13 @@ body {
     flex: 1;
     border-top: 4px solid var(--green);
     min-width: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.control-panel > * {
+    position: relative;
+    z-index: 2;
 }
 
 .analytics-panel {
@@ -437,6 +444,27 @@ body {
     margin-bottom: 16px;
 }
 
+.mascot-image {
+    position: absolute;
+    right: -16px;
+    bottom: -10px;
+    width: min(18.5vw, 225px);
+    max-width: 22%;
+    opacity: 0.82;
+    filter: brightness(0.92) contrast(0.9) blur(0.8px);
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+    transform: translateY(18px) scale(0.97);
+    transform-origin: bottom right;
+    transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+body.page-ready .mascot-image {
+    opacity: 0.88;
+    transform: translateY(0) scale(1);
+}
+
 .company-details-panel {
     background: var(--bg-soft);
     border-radius: var(--radius);
@@ -600,8 +628,10 @@ body {
 
 .no-company-message {
     text-align: center;
-    padding: 60px 20px;
+    padding: 36px 20px 170px;
     color: var(--text-soft);
+    max-width: 560px;
+    margin: 0 auto;
 }
 
 .no-company-icon {
@@ -878,6 +908,20 @@ body {
 @media (max-width: 1200px) {
     .game-main { flex-direction: column; }
     .businesses-panel, .analytics-panel { flex: 0 0 auto; width: 100%; max-height: none; }
+    .control-panel {
+        display: flex;
+        flex-direction: column;
+    }
+    .mascot-image {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        width: min(28vw, 160px);
+        max-width: 160px;
+        margin: 8px 0 0 auto;
+        opacity: 0.76;
+        transform-origin: center;
+    }
 }
 
 @media (max-width: 768px) {
@@ -888,4 +932,10 @@ body {
     .companies-grid { grid-template-columns: 1fr; }
     .controls-row { flex-direction: column; }
     .formula-item { grid-column: span 1; }
+    .mascot-image {
+        width: min(34vw, 126px);
+        max-width: 126px;
+        margin: 10px auto 0;
+        opacity: 0.7;
+    }
 }

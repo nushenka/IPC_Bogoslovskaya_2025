@@ -9,6 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const uiManager = new UIManager(gameEngine);
         uiManager.initialize();
 
+        requestAnimationFrame(() => {
+            document.body.classList.add("page-ready");
+        });
+
         console.log("Игра успешно запущена");
     } catch (error) {
         console.error("Критическая ошибка при запуске:", error);
