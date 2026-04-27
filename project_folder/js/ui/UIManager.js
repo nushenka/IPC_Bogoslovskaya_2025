@@ -709,7 +709,7 @@ class UIManager {
         (result?.marketChanges?.companyCostChanges || []).forEach((change) => {
             const companyName = companyNameById.get(change.companyId) || change.companyId;
             queueToast(
-                `Внимание! Издержки компании "${companyName}" изменились.\nTC(старые): ${change.beforeFormula}\nTC(новые): ${change.afterFormula}\n${change.beforeFormula} -> ${change.afterFormula}`,
+                `Внимание! Издержки компании "${companyName}" изменились.\n${change.beforeFormula} -> ${change.afterFormula}`,
                 "error",
                 shockAndWarningDuration
             );
@@ -722,7 +722,7 @@ class UIManager {
         (result?.marketChanges?.companyDemandChanges || []).forEach((change) => {
             const companyName = companyNameById.get(change.companyId) || change.companyId;
             queueToast(
-                `Внимание! Спрос компании "${companyName}" изменился.\nP(старый): ${change.beforeFormula}\nP(новый): ${change.afterFormula}\n${change.beforeFormula} -> ${change.afterFormula}`,
+                `Внимание! Спрос компании "${companyName}" изменился.\n${change.beforeFormula} -> ${change.afterFormula}`,
                 "error",
                 shockAndWarningDuration
             );
