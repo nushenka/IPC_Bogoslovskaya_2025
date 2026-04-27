@@ -15,6 +15,7 @@ class GameEngine {
         this.bank = null;
         this.stockMarket = null;
         this.activeShocks = [];
+        this.previousRoundCompanyFunctions = {};
     }
 
     initialize() {
@@ -134,6 +135,70 @@ class GameEngine {
         return this.stockMarket.buyInsiderInfo(this.player.capital);
     }
 
+    formatCostFormula(costState) {
+        if (!costState) return "TC = —";
+
+        const { costA, costB, costC, costMultiplier } = costState;
+        const fmt = (value) => Number(value).toLocaleString("ru-RU", { maximumFractionDigits: 2 });
+
+        let formula = "";
+        if (costA !== 0) {
+            formula = `TC = ${fmt(costA)}Q² + ${fmt(costB)}Q + ${fmt(costC)}`;
+        } else if (costC !== 0) {
+            formula = `TC = ${fmt(costB)}Q + ${fmt(costC)}`;
+        } else {
+            formula = `TC = ${fmt(costB)}Q`;
+        }
+
+        if (costMultiplier !== 1) {
+            return `${formula} × ${fmt(costMultiplier)}`;
+        }
+
+        return formula;
+    }
+
+    formatDemandFormula(demandState) {
+        if (!demandState) return "P = —";
+
+        const { demandA, demandB, demandMultiplier } = demandState;
+        const fmt = (value) => Number(value).toLocaleString("ru-RU", { maximumFractionDigits: 2 });
+        const effectiveDemandA = Number(demandA) * Number(demandMultiplier);
+
+        return `P = ${fmt(effectiveDemandA)} - ${fmt(demandB)}Q`;
+    }
+
+    doesShockChangeCompanyCosts(shock, companyId) {
+        if (!shock) return false;
+
+        const directChanges = shock.changes || {};
+        const hasDirectCostChange = ["costA", "costB", "costC", "costMultiplier"]
+            .some((key) => typeof directChanges[key] === "number" && directChanges[key] !== 1);
+        const appliesByTarget = shock.target === "all" || shock.target === companyId;
+
+        if (appliesByTarget && hasDirectCostChange) {
+            return true;
+        }
+
+        const hasEffectCostChange = Boolean(shock.effects?.all?.cost || shock.effects?.[companyId]?.cost);
+        return hasEffectCostChange;
+    }
+
+    doesShockChangeCompanyDemand(shock, companyId) {
+        if (!shock) return false;
+
+        const directChanges = shock.changes || {};
+        const hasDirectDemandChange = ["demandA", "demandB", "demandMultiplier"]
+            .some((key) => typeof directChanges[key] === "number" && directChanges[key] !== 1);
+        const appliesByTarget = shock.target === "all" || shock.target === companyId;
+
+        if (appliesByTarget && hasDirectDemandChange) {
+            return true;
+        }
+
+        const hasEffectDemandChange = Boolean(shock.effects?.all?.demand || shock.effects?.[companyId]?.demand);
+        return hasEffectDemandChange;
+    }
+
     snapshotMarketState() {
         const companies = [...this.player.companies, ...this.availableCompanies];
         const companyPrices = Object.fromEntries(
@@ -144,9 +209,42 @@ class GameEngine {
             Object.entries(this.stockMarket.metals).map(([key, metal]) => [key, Math.round(metal.currentPrice)])
         );
 
+        const companyCosts = Object.fromEntries(
+            this.player.companies.map((company) => {
+                const costState = {
+                    costA: Number(company.costA || 0),
+                    costB: Number(company.costB || 0),
+                    costC: Number(company.costC || 0),
+                    costMultiplier: Number(company.costMultiplier || 1)
+                };
+
+                return [company.id, {
+                    ...costState,
+                    formula: this.formatCostFormula(costState)
+                }];
+            })
+        );
+
+        const companyDemands = Object.fromEntries(
+            this.player.companies.map((company) => {
+                const demandState = {
+                    demandA: Number(company.demandA || 0),
+                    demandB: Number(company.demandB || 0),
+                    demandMultiplier: Number(company.demandMultiplier || 1)
+                };
+
+                return [company.id, {
+                    ...demandState,
+                    formula: this.formatDemandFormula(demandState)
+                }];
+            })
+        );
+
         return {
             companyPrices,
             assetPrices,
+            companyCosts,
+            companyDemands,
             interestRate: this.economy.interestRate
         };
     }
@@ -162,7 +260,7 @@ class GameEngine {
         });
     }
 
-    buildChangeNotifications(beforeState, afterState) {
+    buildChangeNotifications(beforeState, afterState, newShock = null) {
         const companyChanges = Object.entries(afterState.companyPrices)
             .filter(([companyId, price]) => beforeState.companyPrices[companyId] !== undefined && beforeState.companyPrices[companyId] !== price)
             .map(([companyId, price]) => ({
@@ -170,6 +268,49 @@ class GameEngine {
                 before: beforeState.companyPrices[companyId],
                 after: price
             }));
+
+        const companyCostChanges = Object.entries(afterState.companyCosts || {})
+            .filter(([companyId, costState]) => {
+                const beforeCost = beforeState.companyCosts?.[companyId];
+                if (!beforeCost) return false;
+
+                return beforeCost.costA !== costState.costA
+                    || beforeCost.costB !== costState.costB
+                    || beforeCost.costC !== costState.costC
+                    || beforeCost.costMultiplier !== costState.costMultiplier;
+            })
+            .map(([companyId, costState]) => {
+                const beforeCost = beforeState.companyCosts[companyId];
+                return {
+                    companyId,
+                    before: beforeCost,
+                    after: costState,
+                    beforeFormula: beforeCost.formula,
+                    afterFormula: costState.formula,
+                    causedByNewShock: this.doesShockChangeCompanyCosts(newShock, companyId)
+                };
+            });
+
+        const companyDemandChanges = Object.entries(afterState.companyDemands || {})
+            .filter(([companyId, demandState]) => {
+                const beforeDemand = beforeState.companyDemands?.[companyId];
+                if (!beforeDemand) return false;
+
+                return beforeDemand.demandA !== demandState.demandA
+                    || beforeDemand.demandB !== demandState.demandB
+                    || beforeDemand.demandMultiplier !== demandState.demandMultiplier;
+            })
+            .map(([companyId, demandState]) => {
+                const beforeDemand = beforeState.companyDemands[companyId];
+                return {
+                    companyId,
+                    before: beforeDemand,
+                    after: demandState,
+                    beforeFormula: beforeDemand.formula,
+                    afterFormula: demandState.formula,
+                    causedByNewShock: this.doesShockChangeCompanyDemand(newShock, companyId)
+                };
+            });
 
         const assetChanges = Object.entries(afterState.assetPrices)
             .filter(([asset, price]) => beforeState.assetPrices[asset] !== undefined && beforeState.assetPrices[asset] !== price)
@@ -181,6 +322,8 @@ class GameEngine {
 
         return {
             companyChanges,
+            companyCostChanges,
+            companyDemandChanges,
             assetChanges,
             interestRateChanged: beforeState.interestRate !== afterState.interestRate
                 ? {
@@ -265,7 +408,16 @@ class GameEngine {
         console.log(`Капитал игрока: ${this.player.capital.toLocaleString()}₽`);
         
         const afterState = this.snapshotMarketState();
-        const marketChanges = this.buildChangeNotifications(beforeState, afterState);
+        const marketChanges = this.buildChangeNotifications(beforeState, afterState, newShock);
+        this.previousRoundCompanyFunctions = Object.fromEntries(
+            Object.entries(beforeState.companyCosts || {}).map(([companyId, costState]) => [
+                companyId,
+                {
+                    demandFormula: beforeState.companyDemands?.[companyId]?.formula || null,
+                    costFormula: costState?.formula || null
+                }
+            ])
+        );
         this.currentRound++;
         
         return {
@@ -305,7 +457,8 @@ class GameEngine {
             stockMarket: this.stockMarket ? this.stockMarket.getState() : null,
             availableCompanies: this.availableCompanies,
             availableCompaniesCount: this.availableCompanies.length,
-            activeShocks: this.activeShocks.filter(s => s.roundsRemaining > 0)
+            activeShocks: this.activeShocks.filter(s => s.roundsRemaining > 0),
+            previousRoundCompanyFunctions: this.previousRoundCompanyFunctions
         };
     }
     
