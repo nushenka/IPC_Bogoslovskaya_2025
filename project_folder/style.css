@@ -530,6 +530,45 @@ body.page-ready .mascot-image {
     word-break: break-all;
 }
 
+.formula-compare {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.formula-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.formula-chip {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    padding: 3px 8px;
+    white-space: nowrap;
+}
+
+.formula-chip-new {
+    background: #e6f4ea;
+    color: #1f6f43;
+}
+
+.formula-chip-old {
+    background: #edf1f8;
+    color: #52627a;
+}
+
+.formula-demand-old,
+.formula-cost-old {
+    opacity: 0.8;
+}
+
 .formula-row { align-items: flex-start; }
 .formula-label { font-size: 0.85rem; color: var(--text-mid); }
 .formula-value {
@@ -882,7 +921,9 @@ body.page-ready .mascot-image {
     transition: all 0.3s ease;
     box-shadow: var(--shadow-md);
     pointer-events: none;
-    white-space: nowrap;
+    white-space: pre-line;
+    max-width: min(90vw, 720px);
+    text-align: left;
 }
 
 .toast-visible {
