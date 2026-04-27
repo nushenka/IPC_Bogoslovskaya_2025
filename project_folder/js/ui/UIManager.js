@@ -141,7 +141,7 @@ class UIManager {
                 <div class="instruction-actions">
                     <button id="btnPrevInstruction" class="btn btn-secondary btn-large">Назад</button>
                     <button id="btnNextInstruction" class="btn btn-info btn-large">Далее</button>
-                    <button id="btnStartGame" class="btn btn-primary btn-large" style="display:none;">Начать игру</button>
+                    <button id="btnStartGame" class="btn btn-primary btn-large">Начать игру</button>
                 </div>
             </div>
         </div>`;
@@ -174,7 +174,7 @@ class UIManager {
         const isFirst = this.instructionStepIndex === 0;
         prevBtn.style.display = isFirst ? "none" : "inline-flex";
         nextBtn.style.display = isLast ? "none" : "inline-flex";
-        startBtn.style.display = isLast ? "inline-flex" : "none";
+        startBtn.style.display = "inline-flex";
     }
 
     openInstructionPage() {
