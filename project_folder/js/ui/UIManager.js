@@ -4,11 +4,14 @@ class UIManager {
         this.selectedCompany = null;
         this.chartInstance = null;
         this.marketCharts = {};
+        this.instructionStorageKey = "instructionSeen";
+        this.instructionStepIndex = 0;
     }
 
     initialize() {
         this.bindEvents();
         this.updateUI();
+        this.initializeInstruction();
     }
 
     bindEvents() {
@@ -29,6 +32,189 @@ class UIManager {
         document.getElementById("btnSellSilver")?.addEventListener("click", () => this.sellMetal("silver"));
         document.getElementById("btnInsiderInfo")?.addEventListener("click", () => this.buyInsiderInfo());
         document.getElementById("btnTakeLoan")?.addEventListener("click", () => this.takeLoan());
+        document.getElementById("btnOpenInstruction")?.addEventListener("click", () => this.openInstructionPage());
+    }
+
+    initializeInstruction() {
+        this.openInstructionPage();
+    }
+
+    setInstructionSeen() {
+        localStorage.setItem(this.instructionStorageKey, "true");
+    }
+
+    getInstructionSteps() {
+        return [
+            {
+                title: "Добро пожаловать",
+                body: `
+                    <p>Это симулятор, где вы управляете компаниями, выбираете цену <code>P</code> и выпуск <code>Q</code>, а затем проверяете итог по прибыли.</p>
+                    <p>В каждом раунде рынок меняется, поэтому важно считать аккуратно и сравнивать текущие и прошлые функции.</p>
+                `
+            },
+            {
+                title: "Прибыль и базовые формулы",
+                body: `
+                    <p><strong>Выручка:</strong> <code>R = P × Q</code></p>
+                    <p><strong>Прибыль:</strong> <code>π = P × Q − TC − tax × Q</code></p>
+                    <p>Налог: <strong>2</strong> на единицу продукции. Налог не входит в <code>TC</code>.</p>
+                    <p class="instruction-note">Если прибыль отрицательная, иногда оптимально выбрать <code>Q = 0</code>.</p>
+                `
+            },
+            {
+                title: "Как принимать решение в раунде",
+                body: `
+                    <ol>
+                        <li>Посмотрите функции спроса и издержек.</li>
+                        <li>Найдите оптимальные <code>P</code>, <code>Q</code> и оцените <code>π</code>.</li>
+                        <li>Проверьте влияние налога, шоков и долгов.</li>
+                        <li>Сохраните решение до кнопки «Следующий раунд».</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Совершенная конкуренция и монополия",
+                body: `
+                    <p><strong>Совершенная конкуренция:</strong> <code>P = MC</code></p>
+                    <ol>
+                        <li>Цена задается рынком.</li>
+                        <li>Найдите <code>MC = dTC/dQ</code>.</li>
+                        <li>Из <code>P = MC</code> получите выпуск <code>Q</code>.</li>
+                        <li>Если <code>P &lt; AVC</code>, выбирайте <code>Q = 0</code>.</li>
+                    </ol>
+                    <p><strong>Монополия:</strong> максимум прибыли при <code>MR = MC</code>, затем находите <code>Q*</code>, <code>P*</code>, <code>π</code>.</p>
+                `
+            },
+            {
+                title: "Олигополия Курно (кратко)",
+                body: `
+                    <p><strong>Идея:</strong> фирмы выбирают выпуск одновременно.</p>
+                    <p><code>Q = Q1 + Q2</code>, <code>P = 180 − Q</code>, <code>πᵢ = P·Qᵢ − TCᵢ</code></p>
+                    <ol>
+                        <li>Запишите прибыль обеих фирм через <code>Q1</code> и <code>Q2</code>.</li>
+                        <li>Найдите линии реакции (пример): <code>Q1 = (30 − Q2)/2</code>, <code>Q2 = (80 − Q1)/2</code>.</li>
+                        <li>Равновесие Курно: точка пересечения реакций.</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Олигополия Штакельберга (кратко)",
+                body: `
+                    <p><strong>Идея:</strong> лидер ходит первым, последователь реагирует.</p>
+                    <p>Сначала найдите реакцию второй фирмы, например: <code>Q2 = (20 − Q1)/2</code> (с учетом <code>Q2 ≥ 0</code>).</p>
+                    <ol>
+                        <li>Подставьте <code>Q2(Q1)</code> в прибыль лидера <code>π1</code>.</li>
+                        <li>Максимизируйте <code>π1</code> по <code>Q1</code>.</li>
+                        <li>Получите оптимальные <code>Q1*</code>, затем <code>Q2*</code> и цену.</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Шоки, инсайды и финансы",
+                body: `
+                    <p><strong>Шоки</strong> меняют спрос и издержки на несколько раундов.</p>
+                    <p><strong>Инсайды</strong> дают информацию о будущем шоке и помогают подготовить решение заранее.</p>
+                    <p><strong>Банк и активы:</strong> кредиты нужно возвращать со ставкой, активы (золото/серебро) можно использовать для диверсификации.</p>
+                    <p class="instruction-note"><strong>Важно:</strong> иногда лучше не производить, чем работать в убыток.</p>
+                `
+            }
+        ];
+    }
+
+    getInstructionTemplate() {
+        return `
+        <div class="instruction-overlay" id="instructionOverlay">
+            <div class="instruction-page">
+                <div class="instruction-hero">
+                    <div class="instruction-hero-text">
+                        <p class="instruction-kicker">Добро пожаловать</p>
+                        <h2>ВШЭ Экономический Симулятор</h2>
+                        <p>Здесь вы учитесь принимать управленческие решения в разных рыночных структурах: выбирать цену, объем, считать прибыль и реагировать на шоки.</p>
+                    </div>
+                    <img src="./assets/crow.png" alt="Ворон-наставник" class="instruction-crow">
+                </div>
+
+                <div class="instruction-stepper">
+                    <div class="instruction-step-meta">
+                        <span id="instructionStepCounter" class="instruction-step-counter"></span>
+                        <div id="instructionStepDots" class="instruction-step-dots"></div>
+                    </div>
+                    <article id="instructionStepCard" class="instruction-step-card"></article>
+                </div>
+
+                <div class="instruction-actions">
+                    <button id="btnPrevInstruction" class="btn btn-secondary btn-large">Назад</button>
+                    <button id="btnNextInstruction" class="btn btn-info btn-large">Далее</button>
+                    <button id="btnStartGame" class="btn btn-primary btn-large" style="display:none;">Начать игру</button>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    renderInstructionStep() {
+        const steps = this.getInstructionSteps();
+        const total = steps.length;
+        const step = steps[this.instructionStepIndex];
+
+        const card = document.getElementById("instructionStepCard");
+        const counter = document.getElementById("instructionStepCounter");
+        const dots = document.getElementById("instructionStepDots");
+        const prevBtn = document.getElementById("btnPrevInstruction");
+        const nextBtn = document.getElementById("btnNextInstruction");
+        const startBtn = document.getElementById("btnStartGame");
+        if (!card || !counter || !dots || !prevBtn || !nextBtn || !startBtn || !step) return;
+
+        card.innerHTML = `
+            <h3>${step.title}</h3>
+            <div class="instruction-step-body">${step.body}</div>
+        `;
+
+        counter.textContent = `Шаг ${this.instructionStepIndex + 1} из ${total}`;
+        dots.innerHTML = steps.map((_, idx) => `
+            <span class="instruction-dot ${idx === this.instructionStepIndex ? "active" : ""}"></span>
+        `).join("");
+
+        const isLast = this.instructionStepIndex === total - 1;
+        const isFirst = this.instructionStepIndex === 0;
+        prevBtn.style.display = isFirst ? "none" : "inline-flex";
+        nextBtn.style.display = isLast ? "none" : "inline-flex";
+        startBtn.style.display = isLast ? "inline-flex" : "none";
+    }
+
+    openInstructionPage() {
+        if (document.getElementById("instructionOverlay")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = this.getInstructionTemplate();
+        document.body.appendChild(wrapper.firstElementChild);
+        document.body.classList.add("instruction-open");
+        this.instructionStepIndex = 0;
+        this.renderInstructionStep();
+
+        document.getElementById("btnPrevInstruction")?.addEventListener("click", () => {
+            if (this.instructionStepIndex > 0) {
+                this.instructionStepIndex -= 1;
+                this.renderInstructionStep();
+            }
+        });
+
+        document.getElementById("btnNextInstruction")?.addEventListener("click", () => {
+            const total = this.getInstructionSteps().length;
+            if (this.instructionStepIndex < total - 1) {
+                this.instructionStepIndex += 1;
+                this.renderInstructionStep();
+            }
+        });
+
+        document.getElementById("btnStartGame")?.addEventListener("click", () => {
+            this.setInstructionSeen();
+            this.closeInstructionPage();
+        });
+    }
+
+    closeInstructionPage() {
+        document.getElementById("instructionOverlay")?.remove();
+        document.body.classList.remove("instruction-open");
     }
 
     updateUI() {
