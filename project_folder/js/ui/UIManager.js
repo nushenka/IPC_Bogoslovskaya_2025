@@ -184,9 +184,13 @@ class UIManager {
         if (!panel) return;
 
         const company = this.selectedCompany;
+        const state = this.gameEngine.getGameState();
         const info = company.getDetailedInfo();
         const decision = company.getPlayerDecision();
-        const unitTax = this.gameEngine.getGameState().economy.taxRate;
+        const unitTax = state.economy.taxRate;
+        const previousRoundInfo = state.previousRoundCompanyFunctions?.[company.id] || {};
+        const oldDemandFormula = previousRoundInfo.demandFormula || "— (появится после следующего раунда)";
+        const oldCostFormula = previousRoundInfo.costFormula || "— (появится после следующего раунда)";
         const marketValue = Math.round(company.basePrice);
         const sellValue = Math.round(company.basePrice * 0.7);
 
@@ -228,11 +232,29 @@ class UIManager {
             </div>
             <div class="detail-item formula-item">
                 <span class="detail-label">Функция спроса:</span>
-                <span class="detail-value formula-demand">${info.demandFormula}</span>
+                <div class="formula-compare">
+                    <div class="formula-entry">
+                        <span class="formula-chip formula-chip-new">Новая</span>
+                        <span class="detail-value formula-demand">${info.demandFormula}</span>
+                    </div>
+                    <div class="formula-entry">
+                        <span class="formula-chip formula-chip-old">Старая</span>
+                        <span class="detail-value formula-demand formula-demand-old">${oldDemandFormula}</span>
+                    </div>
+                </div>
             </div>
             <div class="detail-item formula-item">
                 <span class="detail-label">Функция издержек:</span>
-                <span class="detail-value formula-cost">${info.costFormula}</span>
+                <div class="formula-compare">
+                    <div class="formula-entry">
+                        <span class="formula-chip formula-chip-new">Новая</span>
+                        <span class="detail-value formula-cost">${info.costFormula}</span>
+                    </div>
+                    <div class="formula-entry">
+                        <span class="formula-chip formula-chip-old">Старая</span>
+                        <span class="detail-value formula-cost formula-cost-old">${oldCostFormula}</span>
+                    </div>
+                </div>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Важно:</span>
@@ -648,11 +670,12 @@ class UIManager {
             [...this.gameEngine.player.companies, ...this.gameEngine.availableCompanies]
                 .map((company) => [company.id, company.name])
         );
+        const shockAndWarningDuration = 15000;
 
         let delay = 0;
-        const queueToast = (message, type = "success") => {
-            setTimeout(() => this.showToast(message, type), delay);
-            delay += 5400;
+        const queueToast = (message, type = "success", durationMs = 5200) => {
+            setTimeout(() => this.showToast(message, type, durationMs), delay);
+            delay += durationMs + 450;
         };
 
         (result?.decisionReports || [])
@@ -680,7 +703,41 @@ class UIManager {
         }
 
         if (result?.newShock) {
-            queueToast(`Новый шок: ${result.newShock.name}`, "error");
+            queueToast(`Новый шок: ${result.newShock.name}`, "error", shockAndWarningDuration);
+        }
+
+        (result?.marketChanges?.companyCostChanges || []).forEach((change) => {
+            const companyName = companyNameById.get(change.companyId) || change.companyId;
+            queueToast(
+                `Внимание! Издержки компании "${companyName}" изменились.\nTC(старые): ${change.beforeFormula}\nTC(новые): ${change.afterFormula}\n${change.beforeFormula} -> ${change.afterFormula}`,
+                "error",
+                shockAndWarningDuration
+            );
+
+            if (change.causedByNewShock && result?.newShock?.name) {
+                queueToast(`Причина изменения издержек: шок "${result.newShock.name}".`, "error", shockAndWarningDuration);
+            }
+        });
+
+        (result?.marketChanges?.companyDemandChanges || []).forEach((change) => {
+            const companyName = companyNameById.get(change.companyId) || change.companyId;
+            queueToast(
+                `Внимание! Спрос компании "${companyName}" изменился.\nP(старый): ${change.beforeFormula}\nP(новый): ${change.afterFormula}\n${change.beforeFormula} -> ${change.afterFormula}`,
+                "error",
+                shockAndWarningDuration
+            );
+
+            if (change.causedByNewShock && result?.newShock?.name) {
+                queueToast(`Причина изменения спроса: шок "${result.newShock.name}".`, "error", shockAndWarningDuration);
+            }
+        });
+
+        if ((result?.marketChanges?.companyCostChanges || []).length > 0 && !result?.newShock) {
+            queueToast("Издержки изменились из-за активных или завершившихся шоков.", "error", shockAndWarningDuration);
+        }
+
+        if ((result?.marketChanges?.companyDemandChanges || []).length > 0 && !result?.newShock) {
+            queueToast("Спрос изменился из-за активных или завершившихся шоков.", "error", shockAndWarningDuration);
         }
 
         (result?.marketChanges?.companyChanges || []).slice(0, 4).forEach((change) => {
@@ -702,7 +759,7 @@ class UIManager {
         });
     }
 
-    showToast(message, type = "success") {
+    showToast(message, type = "success", durationMs = 5200) {
         document.getElementById("gameToast")?.remove();
         const toast = document.createElement("div");
         toast.id = "gameToast";
@@ -713,7 +770,7 @@ class UIManager {
         setTimeout(() => {
             toast.classList.remove("toast-visible");
             setTimeout(() => toast.remove(), 300);
-        }, 5200);
+        }, durationMs);
     }
 
 }
