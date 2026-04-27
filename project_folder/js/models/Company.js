@@ -175,8 +175,10 @@ class Company {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
         const unitTax = this._getUnitTax(taxRate);
-        const denominator = b + 2 * this.costA * this.costMultiplier;
-        const numerator = a - this.costB * this.costMultiplier - unitTax;
+        const mcSlope = 2 * this.costA * this.costMultiplier;
+        const mcIntercept = this.costB * this.costMultiplier + unitTax;
+        const denominator = b + mcSlope;
+        const numerator = a - mcIntercept;
         const Q = denominator > 0 ? Math.max(0, numerator / denominator) : 0;
         const P = this._price(Q);
         const tc = this._tc(Q, taxRate);
