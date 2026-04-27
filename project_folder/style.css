@@ -821,6 +821,220 @@ body.page-ready .mascot-image {
     animation: fadeInOverlay 0.25s ease;
 }
 
+.instruction-open {
+    overflow: hidden;
+}
+
+.instruction-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2100;
+    padding: 24px;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(107,159,247,0.26) 0%, transparent 46%),
+        radial-gradient(circle at 85% 85%, rgba(167,139,250,0.24) 0%, transparent 46%),
+        rgba(239,244,255,0.95);
+    backdrop-filter: blur(3px);
+    overflow-y: auto;
+}
+
+.instruction-page {
+    max-width: 1150px;
+    margin: 0 auto;
+    border-radius: 24px;
+    background: linear-gradient(165deg, #ffffff 0%, #f6f8ff 100%);
+    border: 1px solid #d9e3ff;
+    box-shadow: 0 16px 44px rgba(88,108,180,0.19);
+    padding: 24px;
+}
+
+.instruction-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-radius: 18px;
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    border: 1px solid #d6e2ff;
+    background: linear-gradient(140deg, #edf2ff 0%, #f4ecff 100%);
+}
+
+.instruction-hero-text h2 {
+    font-size: clamp(1.45rem, 2.6vw, 2rem);
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #2f3b5e;
+}
+
+.instruction-kicker {
+    color: #5878d8;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.instruction-hero-text p {
+    color: #4f5f84;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 720px;
+}
+
+.instruction-crow {
+    width: min(16vw, 140px);
+    min-width: 92px;
+    filter: drop-shadow(0 9px 14px rgba(93,111,170,0.22));
+}
+
+.instruction-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.instruction-stepper {
+    border: 1px solid #dbe5ff;
+    background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.instruction-step-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.instruction-step-counter {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #506397;
+    background: #eaf0ff;
+    border: 1px solid #d2deff;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+
+.instruction-step-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.instruction-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cfdaf7;
+}
+
+.instruction-dot.active {
+    background: #648df2;
+    transform: scale(1.1);
+}
+
+.instruction-step-card {
+    background: #fff;
+    border: 1px solid #dee6ff;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(86,111,182,0.09);
+}
+
+.instruction-step-card h3 {
+    font-size: 1.06rem;
+    margin-bottom: 10px;
+    color: #31476e;
+}
+
+.instruction-step-body p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: #4c5c7d;
+    margin-bottom: 8px;
+}
+
+.instruction-step-body ol {
+    margin: 8px 0 6px 18px;
+    color: #4c5c7d;
+}
+
+.instruction-step-body li {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.instruction-card {
+    grid-column: span 6;
+    background: #fff;
+    border: 1px solid #dde6ff;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 3px 12px rgba(96,124,193,0.08);
+}
+
+.instruction-card h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #334468;
+}
+
+.instruction-card p {
+    font-size: 0.9rem;
+    line-height: 1.48;
+    color: #4c5c7d;
+    margin-bottom: 6px;
+}
+
+.instruction-card code {
+    font-family: var(--font-mono);
+    background: #edf3ff;
+    color: #3256a7;
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-size: 0.84rem;
+}
+
+.instruction-card ol,
+.instruction-card ul {
+    margin: 8px 0 4px 18px;
+    color: #4b5a7b;
+}
+
+.instruction-card li {
+    margin-bottom: 5px;
+    font-size: 0.89rem;
+    line-height: 1.45;
+}
+
+.instruction-note {
+    margin-top: 8px;
+    color: #3f4e74;
+    background: #f2f6ff;
+    border-radius: 8px;
+    border-left: 3px solid #86a6ff;
+    padding: 6px 9px;
+}
+
+.instruction-card-warning {
+    grid-column: 1 / -1;
+    background: linear-gradient(140deg, #fff7df 0%, #fff2cc 100%);
+    border-color: #f7db8a;
+}
+
+.instruction-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #dbe5ff;
+}
+
 @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
 
 .modal-content {
@@ -978,5 +1192,30 @@ body.page-ready .mascot-image {
         max-width: 126px;
         margin: 10px auto 0;
         opacity: 0.7;
+    }
+    .instruction-overlay {
+        padding: 12px;
+    }
+    .instruction-page {
+        padding: 14px;
+        border-radius: 16px;
+    }
+    .instruction-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .instruction-crow {
+        width: min(38vw, 130px);
+        align-self: center;
+    }
+    .instruction-card {
+        grid-column: 1 / -1;
+    }
+    .instruction-actions {
+        flex-direction: column;
+    }
+    .instruction-actions .btn {
+        width: 100%;
+        justify-content: center;
     }
 }
