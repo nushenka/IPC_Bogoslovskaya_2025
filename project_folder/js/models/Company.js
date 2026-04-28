@@ -534,12 +534,14 @@ class Company {
                 round,
                 companyId: this.id,
                 companyName: this.name,
-                actualProfit: 0
+                actualProfit: 0,
+                capitalDelta: 0
             };
         }
 
         const expected = this.getTheoreticalOutcome(taxRate);
         const actualProfit = expected.profit;
+        const capitalDelta = Math.min(submission.expectedProfit, actualProfit);
         const isCorrect =
             this._matchesStudentValue(submission.price, expected.P, 1) &&
             this._matchesStudentValue(submission.quantity, expected.Q, 1) &&
@@ -560,6 +562,7 @@ class Company {
             companyName: this.name,
             isCorrect,
             actualProfit: this.profit,
+            capitalDelta,
             playerProfit: submission.expectedProfit,
             playerPrice: submission.price,
             playerQuantity: submission.quantity
