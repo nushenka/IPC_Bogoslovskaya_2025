@@ -6,6 +6,7 @@ class UIManager {
         this.marketCharts = {};
         this.instructionStorageKey = "instructionSeen";
         this.instructionStepIndex = 0;
+        this.isGameOver = false;
     }
 
     initialize() {
@@ -16,8 +17,10 @@ class UIManager {
 
     bindEvents() {
         document.getElementById("btnNextRound")?.addEventListener("click", () => {
+            if (this.isGameOver) return;
             const result = this.gameEngine.nextRound();
             this.updateUI();
+            if (this.isGameOver) return;
             this.updateRoundStatus(result);
             this.updateQuickAnalytics(result);
             this.showDecisionNotifications(result);
@@ -222,6 +225,36 @@ class UIManager {
         this.updateShockPanel(state);
         this.updateBankPanel(state);
         this.updateStockMarketPanel(state);
+        this.checkGameOver(state);
+    }
+
+    checkGameOver(state) {
+        if (this.isGameOver) return;
+        if (!state?.player) return;
+        if (state.player.capital >= 0) return;
+
+        this.isGameOver = true;
+        this.showGameOverOverlay(state.player.capital);
+    }
+
+    showGameOverOverlay(capital) {
+        if (document.getElementById("gameOverOverlay")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = `
+        <div class="game-over-overlay" id="gameOverOverlay">
+            <div class="game-over-card">
+                <h2>Game Over</h2>
+                <p>Ваш капитал стал отрицательным.</p>
+                <p>Игра завершена. Нажмите кнопку ниже, чтобы начать заново.</p>
+                <button id="btnRestartGame" class="btn btn-primary btn-large">Играть заново</button>
+            </div>
+        </div>`;
+        document.body.appendChild(wrapper.firstElementChild);
+
+        document.getElementById("btnRestartGame")?.addEventListener("click", () => {
+            window.location.reload();
+        });
     }
 
     updatePlayerStats(state) {
