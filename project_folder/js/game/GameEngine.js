@@ -387,13 +387,14 @@ class GameEngine {
         
         this.player.companies.forEach(company => {
             const report = company.resolveRoundDecision(this.economy.taxRate, this.currentRound);
-            const profit = report.actualProfit || 0;
+            const profit = report.capitalDelta ?? report.actualProfit ?? 0;
             totalProfit += profit;
             decisionReports.push(report);
 
             companyProfits.push({
                 name: company.name,
                 profit: profit,
+                actualProfit: report.actualProfit ?? 0,
                 revenue: company.revenue,
                 cost: company.totalCost,
                 demand: company.demand
