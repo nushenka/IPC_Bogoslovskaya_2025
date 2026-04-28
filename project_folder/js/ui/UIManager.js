@@ -896,12 +896,21 @@ class UIManager {
         (result?.decisionReports || [])
             .filter((report) => report.submitted)
             .forEach((report) => {
-                const amount = Math.round(report.actualProfit).toLocaleString("ru-RU");
-                const outcome = report.actualProfit >= 0 ? `+${amount} ₽ к капиталу` : `${amount} ₽ к капиталу`;
-                const message = report.isCorrect
-                    ? `${report.companyName}: решение верное, ${outcome}`
-                    : `${report.companyName}: решение неверное, фактический результат ${outcome}`;
-                queueToast(message, report.actualProfit >= 0 ? "success" : "error");
+                const capitalDelta = report.capitalDelta ?? report.actualProfit ?? 0;
+                const amount = Math.round(capitalDelta).toLocaleString("ru-RU");
+                const outcome = capitalDelta >= 0 ? `+${amount} ₽ к капиталу` : `${amount} ₽ к капиталу`;
+
+                let message = `${report.companyName}: решение верное, ${outcome}`;
+                if (!report.isCorrect) {
+                    const actualProfit = report.actualProfit ?? 0;
+                    const actualAmount = Math.round(actualProfit).toLocaleString("ru-RU");
+                    const actualText = actualProfit >= 0 ? `+${actualAmount} ₽` : `${actualAmount} ₽`;
+                    message = report.capitalDelta !== report.actualProfit
+                        ? `${report.companyName}: решение неверное, фактический результат ${actualText}, начислено ${outcome}`
+                        : `${report.companyName}: решение неверное, ${outcome}`;
+                }
+
+                queueToast(message, capitalDelta >= 0 ? "success" : "error");
             });
 
         (result?.loanReports || []).forEach((loanReport) => {
