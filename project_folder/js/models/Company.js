@@ -87,7 +87,7 @@ class Company {
     _reactionDenominator(costA) {
         return 2 * this.demandB + 2 * costA;
     }
-
+//округление
     _normalizeOutcome(result) {
         return {
             ...result,
@@ -102,7 +102,7 @@ class Company {
             Qtotal: result.Qtotal === undefined ? undefined : this._round(result.Qtotal)
         };
     }
-
+//если прибыль отрицательная лучше не работать, чем работать
     _applyShutdownRule(result, taxRate = 0) {
         if (result.profit < 0) {
             const shutdownPrice = this._round(this.demandA * this.demandMultiplier);
@@ -121,8 +121,8 @@ class Company {
 
         return this._normalizeOutcome(result);
     }
-
-    _matchesStudentValue(studentValue, actualValue, baseTolerance = 1) {
+//проверка решения игрока
+    _matchesStudentValue(studentValue, actualValue, baseTolerance = 3) {
         const roundedActual = Math.round(actualValue);
         return Math.abs(studentValue - actualValue) <= baseTolerance
             || Math.abs(studentValue - roundedActual) <= baseTolerance;
