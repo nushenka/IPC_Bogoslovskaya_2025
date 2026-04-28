@@ -35,7 +35,7 @@ class GameEngine {
         
         return true;
     }
-    
+    //создается список доступных компании на основе конфигурации, каждая компания получает свои начальные параметры и формулы издержек и спроса
     initializeCompanies() {
         this.availableCompanies = [];
         
@@ -56,7 +56,8 @@ class GameEngine {
         console.error('Компания не найдена');
         return false;
     }
-    
+    //описываем покупку компанием игроком: проверяем, достаточно ли у игрока капитала для покупки, если да - создаем экземпляр компании, принадлежащей игроку, и переносим ее из списка доступных в список компаний игрока, обновляем капитал и чистую стоимость игрока
+    // также выводим в консоль информацию о купленной компании и ее формуле издержек для наглядности
     const company = this.availableCompanies[companyIndex];
     
     if (this.player.capital >= company.basePrice) {
@@ -66,6 +67,7 @@ class GameEngine {
         this.player.addCompany(playerCompany);
         this.player.capital -= company.basePrice;
         this.player.netWorth = this.player.calculateNetWorth();
+        //делает так, чтобы компания, которая была куплена игроком, больше не отображалась в списке доступных компаний для покупки
         this.availableCompanies.splice(companyIndex, 1);
         
         console.log('Компания куплена:', playerCompany.name);
@@ -86,7 +88,7 @@ class GameEngine {
     }
     
     const company = this.player.companies[companyIndex];
-    
+    //идейно: мы хотим, чтобы игроки не покупали комапнии, чтобы посмотреть их издержки, это добавляет риск и интерес, а также позволяет игроку частично вернуть вложенные средства при продаже компании, которая ему не подходит
     const sellPrice = Math.round(company.basePrice * 0.7);
     this.player.capital += sellPrice;
     const availableCompany = new Company(company.config);
@@ -99,7 +101,7 @@ class GameEngine {
     
     return sellPrice;
 }
-    
+    // ставим производство и прибыль
     updateCompany(companyId, updates) {
         const company = this.player.companies.find(c => c.id === companyId);
         if (!company) return false;
@@ -134,7 +136,7 @@ class GameEngine {
     buyInsiderInfo() {
         return this.stockMarket.buyInsiderInfo(this.player.capital);
     }
-
+// отображение формул издержек и спроса для каждой компании
     formatCostFormula(costState) {
         if (!costState) return "TC = —";
 
@@ -166,7 +168,7 @@ class GameEngine {
 
         return `P = ${fmt(effectiveDemandA)} - ${fmt(demandB)}Q`;
     }
-
+// проверка, изменяют ли текущие активные шоки формулы издержек для конкретной компании
     doesShockChangeCompanyCosts(shock, companyId) {
         if (!shock) return false;
 
@@ -182,7 +184,7 @@ class GameEngine {
         const hasEffectCostChange = Boolean(shock.effects?.all?.cost || shock.effects?.[companyId]?.cost);
         return hasEffectCostChange;
     }
-
+// проверка, изменяют ли текущие активные шоки формулы спроса для конкретной компании
     doesShockChangeCompanyDemand(shock, companyId) {
         if (!shock) return false;
 
@@ -198,7 +200,7 @@ class GameEngine {
         const hasEffectDemandChange = Boolean(shock.effects?.all?.demand || shock.effects?.[companyId]?.demand);
         return hasEffectDemandChange;
     }
-
+//для сравнения относительно измненеия рынка до и после раунда, а также для построения уведомлений об изменениях, которые произошли в результате раунда и примененных шоков
     snapshotMarketState() {
         const companies = [...this.player.companies, ...this.availableCompanies];
         const companyPrices = Object.fromEntries(
@@ -333,7 +335,7 @@ class GameEngine {
                 : null
         };
     }
-
+// описываем применение шока: добавляем его в список активных шоков, применяем его эффекты к компаниям игрока, экономической среде и фондовому рынку, а также проверяем, влияет ли он на стоимость компаний, чтобы при необходимости обновить их базовую цену
     applyShock(shock) {
         console.log(`Применяется шок: ${shock.name}`);
         
@@ -359,7 +361,7 @@ class GameEngine {
         const randomIndex = Math.floor(Math.random() * SHOCKS.length);
         return { ...SHOCKS[randomIndex] };
     }
-    
+    // собирает информацию по изменениб в течение раунда(изменение цен компаний, издержек, спроса, цен)
     nextRound() {
         console.log(`=== Начало раунда ${this.currentRound} ===`);
         const upcomingRound = this.currentRound + 1;
@@ -373,6 +375,7 @@ class GameEngine {
         this.updateActiveShocks();
 
         let newShock = null;
+        // если игрок купил инсайдерскую информацию в предыдущем раунде, то в начале следующего раунда мы применяем шок
         if (upcomingRound >= 2 && SHOCKS && SHOCKS.length > 0) {
             const shock = this.stockMarket.consumeInsiderShock(upcomingRound) || this.getRandomShock();
             if (shock) {
@@ -387,14 +390,13 @@ class GameEngine {
         
         this.player.companies.forEach(company => {
             const report = company.resolveRoundDecision(this.economy.taxRate, this.currentRound);
-            const profit = report.capitalDelta ?? report.actualProfit ?? 0;
+            const profit = report.actualProfit || 0;
             totalProfit += profit;
             decisionReports.push(report);
 
             companyProfits.push({
                 name: company.name,
                 profit: profit,
-                actualProfit: report.actualProfit ?? 0,
                 revenue: company.revenue,
                 cost: company.totalCost,
                 demand: company.demand
@@ -436,7 +438,7 @@ class GameEngine {
             activeShocks: this.activeShocks.filter(s => s.roundsRemaining > 0)
         };
     }
-    
+    //чтобы неактивные шоки не отображались
     updateActiveShocks() {
         this.activeShocks = this.activeShocks.filter(shock => {
             shock.roundsRemaining--;
