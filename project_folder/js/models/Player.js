@@ -1,6 +1,6 @@
 class Player {
     constructor(config = {}) {
-        this.capital = config.capital || 1000000;
+        this.capital = config.capital || 1500;
         this.netWorth = config.netWorth || this.capital;
         this.companies = [];
     }
