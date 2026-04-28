@@ -23,8 +23,8 @@ class GameEngine {
         
         this.economy = new EconomicEnvironment();
         this.player = new Player({
-            capital: 1000000,
-            netWorth: 1000000
+            capital: 1500,
+            netWorth: 1500
         });
         this.bank = new Bank();
         this.stockMarket = new StockMarket();
