@@ -312,7 +312,9 @@ class UIManager {
             const decision = company.getPlayerDecision();
             const status = decision.pendingSubmission ? "Решение сохранено" : "Ожидает решение";
             const marketValue = Math.round(company.basePrice);
-            const sellValue = Math.round(company.basePrice * 0.7);
+            const sellValue = typeof company.getResaleValue === "function"
+                ? company.getResaleValue()
+                : Math.round(company.basePrice * 0.7);
 
             return `
             <div class="company-card ${this.selectedCompany?.id === company.id ? "selected" : ""}" data-id="${company.id}">
@@ -401,7 +403,9 @@ class UIManager {
         const oldDemandFormula = previousRoundInfo.demandFormula || "— (появится после следующего раунда)";
         const oldCostFormula = previousRoundInfo.costFormula || "— (появится после следующего раунда)";
         const marketValue = Math.round(company.basePrice);
-        const sellValue = Math.round(company.basePrice * 0.7);
+        const sellValue = typeof company.getResaleValue === "function"
+            ? company.getResaleValue()
+            : Math.round(company.basePrice * 0.7);
 
         const competitorHtml = (company.marketStructure === "cournot" || company.marketStructure === "stackelberg_leader" || company.marketStructure === "stackelberg_follower")
             ? `

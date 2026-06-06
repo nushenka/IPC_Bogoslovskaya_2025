@@ -13,7 +13,7 @@ class Player {
         let worth = this.capital;
         
         this.companies.forEach(company => {
-            worth += company.basePrice;
+            worth += typeof company.getResaleValue === "function" ? company.getResaleValue() : company.basePrice;
         });
         
         return worth;

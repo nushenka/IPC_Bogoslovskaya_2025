@@ -171,6 +171,14 @@ class Company {
         return `TC = ${this.competitorCostB}Q`;
     }
 
+    getResaleValue() {
+        const baseValue = Math.round(this.basePrice * 0.7);
+        const positiveProfitBonus = Math.max(0, Math.round(this.profit * 0.25));
+        const negativeProfitPenalty = Math.max(0, Math.round(Math.abs(Math.min(this.profit, 0)) * 0.1));
+
+        return Math.max(0, baseValue + positiveProfitBonus - negativeProfitPenalty);
+    }
+
     _solvePerfectCompetition(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;

@@ -89,7 +89,9 @@ class GameEngine {
     
     const company = this.player.companies[companyIndex];
     //идейно: мы хотим, чтобы игроки не покупали комапнии, чтобы посмотреть их издержки, это добавляет риск и интерес, а также позволяет игроку частично вернуть вложенные средства при продаже компании, которая ему не подходит
-    const sellPrice = Math.round(company.basePrice * 0.7);
+    const sellPrice = typeof company.getResaleValue === "function"
+        ? company.getResaleValue()
+        : Math.round(company.basePrice * 0.7);
     this.player.capital += sellPrice;
     const availableCompany = new Company(company.config);
     availableCompany.ownedByPlayer = false;
