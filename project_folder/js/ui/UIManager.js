@@ -228,10 +228,10 @@ class UIManager {
         if (state.player.capital >= 0) return;
 
         this.isGameOver = true;
-        this.showGameOverOverlay(state.player.capital);
+        this.showGameOverOverlay();
     }
 
-    showGameOverOverlay(capital) {
+    showGameOverOverlay() {
         if (document.getElementById("gameOverOverlay")) return;
 
         const wrapper = document.createElement("div");

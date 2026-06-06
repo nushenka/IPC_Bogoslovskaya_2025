@@ -64,6 +64,7 @@ class GameEngine {
         const playerCompany = new Company(company.config);
         playerCompany.ownedByPlayer = true;
         playerCompany.randomizeCosts();
+        playerCompany.applyOwnershipDepreciation();
         this.player.addCompany(playerCompany);
         this.player.capital -= company.basePrice;
         this.player.netWorth = this.player.calculateNetWorth();
@@ -89,7 +90,7 @@ class GameEngine {
     
     const company = this.player.companies[companyIndex];
     //идейно: мы хотим, чтобы игроки не покупали комапнии, чтобы посмотреть их издержки, это добавляет риск и интерес, а также позволяет игроку частично вернуть вложенные средства при продаже компании, которая ему не подходит
-    const sellPrice = Math.round(company.basePrice);
+    const sellPrice = Math.max(0, Math.round(company.basePrice));
     this.player.capital += sellPrice;
     const availableCompany = new Company(company.config);
     availableCompany.ownedByPlayer = false;
@@ -239,7 +240,7 @@ class GameEngine {
         [...this.player.companies, ...this.availableCompanies].forEach((company) => {
             const multiplier = effects[company.id];
             if (!multiplier) return;
-            company.basePrice = Math.max(50000, Math.round(company.basePrice * multiplier));
+            company.basePrice = Math.max(1, Math.round(company.basePrice * multiplier));
         });
     }
 
@@ -374,6 +375,8 @@ class GameEngine {
             const profit = report.actualProfit || 0;
             totalProfit += profit;
             decisionReports.push(report);
+
+            company.applyOwnershipDepreciation();
 
             companyProfits.push({
                 name: company.name,

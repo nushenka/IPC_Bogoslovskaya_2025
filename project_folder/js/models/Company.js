@@ -171,6 +171,13 @@ class Company {
         return `TC = ${this.competitorCostB}Q`;
     }
 
+    applyOwnershipDepreciation(rate = 0.1) {
+        if (!this.ownedByPlayer) return this.basePrice;
+
+        this.basePrice = Math.max(0, Math.round(this.basePrice * (1 - rate)));
+        return this.basePrice;
+    }
+
     _solvePerfectCompetition(taxRate = 0) {
         const a = this.demandA * this.demandMultiplier;
         const b = this.demandB;
@@ -537,11 +544,6 @@ class Company {
         this.playerDecision.price = "";
         this.playerDecision.quantity = "";
         this.playerDecision.expectedProfit = "";
-
-        if (this.ownedByPlayer) {
-            const priceDelta = Math.round(actualProfit / 2);
-            this.basePrice = Math.max(0, Math.round(this.basePrice - priceDelta));
-        }
 
         return report;
     }
