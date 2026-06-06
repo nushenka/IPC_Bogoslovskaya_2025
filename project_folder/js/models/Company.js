@@ -361,19 +361,6 @@ class Company {
         this._lastResult = result;
     }
 
-    calculateProfit(taxRate = 20) {
-        const result = this.getTheoreticalOutcome(taxRate);
-        this.production = result.Q;
-        this.productPrice = result.P;
-        this.competitorProduction = result.Q2 || 0;
-        this.totalCost = result.tc;
-        this.revenue = result.rev;
-        this.profit = result.profit;
-        this.demand = result.Q;
-        this._lastResult = result;
-        return this.profit;
-    }
-
     getChartData() {
         const a = this.demandA * this.demandMultiplier;
         const points = 30;
@@ -497,30 +484,6 @@ class Company {
         };
 
         return { success: true };
-    }
-
-    evaluatePlayerDecision() {
-        const price = Number(this.playerDecision.price);
-        const quantity = Number(this.playerDecision.quantity);
-        const profit = Number(this.playerDecision.expectedProfit);
-
-        if ([price, quantity, profit].some((value) => Number.isNaN(value))) {
-            return { isComplete: false, message: "Введите цену, количество и прибыль." };
-        }
-
-        const expected = this.getTheoreticalOutcome();
-        const result = {
-            isComplete: true,
-            expected,
-            priceCorrect: this._matchesStudentValue(price, expected.P, 1),
-            quantityCorrect: this._matchesStudentValue(quantity, expected.Q, 1),
-            profitCorrect: this._matchesStudentValue(profit, expected.profit, 2)
-        };
-
-        result.isCorrect = result.priceCorrect && result.quantityCorrect && result.profitCorrect;
-        result.actualLoss = expected.profit < 0 ? Math.abs(expected.profit) : 0;
-        this.playerDecision.lastCheck = result;
-        return result;
     }
 
     resolveRoundDecision(taxRate, round) {

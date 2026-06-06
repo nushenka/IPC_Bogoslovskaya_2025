@@ -102,25 +102,6 @@ class GameEngine {
     return sellPrice;
 }
     // ставим производство и прибыль
-    updateCompany(companyId, updates) {
-        const company = this.player.companies.find(c => c.id === companyId);
-        if (!company) return false;
-        
-        if (updates.price !== undefined) {
-            company.setPrice(updates.price);
-        }
-        
-        if (updates.production !== undefined) {
-            company.setProduction(updates.production);
-        }
-
-        if (updates.expectedProfit !== undefined) {
-            company.setExpectedProfit(updates.expectedProfit);
-        }
-        
-        return true;
-    }
-    
     takeLoan(amount) {
         return this.bank.takeLoan(this.player, amount, this.economy.interestRate);
     }
@@ -465,36 +446,6 @@ class GameEngine {
         };
     }
     
-    getCompanyDetails(companyId) {
-        let company = this.player.companies.find(c => c.id === companyId);
-        if (!company) {
-            company = this.availableCompanies.find(c => c.id === companyId);
-        }
-        
-        return company ? company.getDetailedInfo() : null;
-    }
-    
-    getFinancialReport() {
-        const state = this.getGameState();
-        
-        return {
-            round: state.round,
-            player: {
-                capital: state.player.capital,
-                netWorth: state.player.netWorth,
-                companiesCount: state.player.companiesCount
-            },
-            companies: state.player.companies.map(company => ({
-                name: company.name,
-                profit: company.profit,
-                revenue: company.revenue,
-                cost: company.totalCost,
-                profitMargin: company.revenue > 0 ? (company.profit / company.revenue * 100) : 0
-            })),
-            economy: state.economy,
-            activeShocks: state.activeShocks
-        };
-    }
 }
 
 export { GameEngine };

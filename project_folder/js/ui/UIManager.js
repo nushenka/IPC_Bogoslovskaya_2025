@@ -4,7 +4,6 @@ class UIManager {
         this.selectedCompany = null;
         this.chartInstance = null;
         this.marketCharts = {};
-        this.instructionStorageKey = "instructionSeen";
         this.instructionStepIndex = 0;
         this.isGameOver = false;
     }
@@ -14,7 +13,7 @@ class UIManager {
         this.updateUI();
         this.initializeInstruction();
     }
-
+//обработчик кнопок
     bindEvents() {
         document.getElementById("btnNextRound")?.addEventListener("click", () => {
             if (this.isGameOver) return;
@@ -40,10 +39,6 @@ class UIManager {
 
     initializeInstruction() {
         this.openInstructionPage();
-    }
-
-    setInstructionSeen() {
-        localStorage.setItem(this.instructionStorageKey, "true");
     }
 
     getInstructionSteps() {
@@ -206,7 +201,6 @@ class UIManager {
         });
 
         document.getElementById("btnStartGame")?.addEventListener("click", () => {
-            this.setInstructionSeen();
             this.closeInstructionPage();
         });
     }
@@ -768,10 +762,6 @@ class UIManager {
             this.updateUI();
             this.showToast(`Компания продана за ${Math.round(value).toLocaleString("ru-RU")} ₽`);
         }
-    }
-
-    showCompanyDetails() {
-        this.updateCompanyDetails();
     }
 
     showBuyCompanyModal() {

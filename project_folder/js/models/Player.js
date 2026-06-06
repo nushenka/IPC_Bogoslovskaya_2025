@@ -9,10 +9,6 @@ class Player {
         this.companies.push(company);
     }
     
-    removeCompany(companyId) {
-        this.companies = this.companies.filter(c => c.id !== companyId);
-    }
-    
     calculateNetWorth() {
         let worth = this.capital;
         
