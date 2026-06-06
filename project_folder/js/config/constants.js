@@ -14,7 +14,7 @@ export const STOCK_MARKET = {
         maxPrice: 3000
     },
     insiderInfo: {
-        basePrice: 50000,
+        basePrice: 300,
         duration: 3
     }
 };
