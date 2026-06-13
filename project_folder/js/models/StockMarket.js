@@ -49,7 +49,13 @@ class StockMarket {
         if (effects.costC) factor *= effects.costC;
         if (effects.demandB) factor *= (2 - effects.demandB);
 
-        return Math.max(0.6, Math.min(1.8, factor));
+        if (factor > 1) {
+            factor = 1 + (factor - 1) * 0.35;
+        } else {
+            factor = 1 + (factor - 1) * 0.7;
+        }
+
+        return Math.max(0.75, Math.min(1.12, factor));
     }
 
     _applyActiveShockPressure() {

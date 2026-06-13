@@ -1,17 +1,17 @@
 export const STOCK_MARKET = {
     gold: {
         name: "Золото",
-        basePrice: 5000,
+        basePrice: 50,
         volatility: 0.1,
-        minPrice: 2500,
-        maxPrice: 10000
+        minPrice: 25,
+        maxPrice: 150
     },
     silver: {
         name: "Серебро",
-        basePrice: 1200,
+        basePrice: 100,
         volatility: 0.14,
-        minPrice: 700,
-        maxPrice: 3000
+        minPrice: 50,
+        maxPrice: 250
     },
     insiderInfo: {
         basePrice: 300,
